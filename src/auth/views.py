@@ -72,38 +72,71 @@ def home():
     return render_template('home.html', posts=posts)
 
 
-@auth.route('/', methods=['GET', 'POST'])
+@auth.route('/signup', methods=['GET', 'POST'])
 def register():
     reg_form = RegistrationForm()
 
-    if request.method == 'POST' and reg_form.validate():
-        email = reg_form.email.data
-        password = reg_form.password.data
-        firstname = reg_form.first_name.data
-        lastname = reg_form.last_name.data
+    if request.method == 'POST' and reg_form.validate_on_submit():
+            email = reg_form.email.data
+            password = reg_form.password.data
+            firstname = reg_form.first_name.data
+            lastname = reg_form.last_name.data
 
-        # check if user exists
-        email_exists = User.query.filter_by(email=email).first()
+            # check if email exists
+            email_exists = User.query.filter_by(email=email).first()
 
-        if email_exists:
-            flash('Email already exists, choose another one.', 'primary')
+            if email_exists:
+                flash('Email already exists, choose another one.', 'primary')
 
-        else:
-            new_user = User(
-                username = firstname + " " + lastname,
-                password = generate_password_hash(password, method='sha256'),
-                email = email 
-                )
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(new_user, remember=True)
-            flash(
-                'User created, you can log in with the registered credentials', 'success')
+            else:
+                new_user = User(
+                    username = firstname + " " + lastname,
+                    password = generate_password_hash(password, method='sha256'),
+                    email = email 
+                    )
+                db.session.add(new_user)
+                db.session.commit()
+                login_user(new_user, remember=True)
+                flash('User created, you can log in with the registered credentials', 'success')
 
-            return redirect(url_for('auth.login'))
+                return redirect(url_for('auth.login'))
 
+    
     return render_template('register.html', form=reg_form)
+
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if current_user.is_authenticated:
+        flash('Your account has been created successfully, you can log in with the registered credentials', 'success')
+        return redirect(url_for('main.viewpage'))
+
+    login_form = LoginForm()
+
+    if request.method == 'POST' and login_form.validate_on_submit():
+        email = login_form.email.data
+        password = login_form.password.data
+        remmember = login_form.remember.data
+
+
+        # check if user exists
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            if check_password_hash(user.password, password):
+                login_user(user, remmember)
+                flash('Logged in!', 'success')
+                return redirect(url_for('main.viewpage'))
+            else:
+                flash('Username or Password is incorrect!', 'error')
+        
+        else:
+            flash('Username or Password is incorrect!', 'error')
+
+    return render_template('login.html', form = login_form, user = current_user)
+
+@auth.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('auth.login'))

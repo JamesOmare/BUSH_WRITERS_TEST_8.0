@@ -64,7 +64,13 @@
             <!-- END FILTERS -->
             <!-- BEGIN RESULT -->
             <div class="col-md-9">
-                <h2><i class="fa fa-file-o"></i> Result</h2>
+                {% if logged_in_user %}
+                    <h2><i class="fa fa-file-o"></i> Welcome {{ logged_in_user.username | title }}</h2>
+                {% else %}
+                    <h2><i class="fa fa-file-o"></i> Welcome </h2>
+                {% endif %}
+                
+                
                 <hr>
                 <!-- BEGIN SEARCH INPUT -->
                 <div class="input-group">

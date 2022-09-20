@@ -9,3 +9,4 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///'+os.path.join(basedir, 'bushwriters.db')
     RECAPTCHA_PUBLIC_KEY = config('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
+    MAX_IMAGE_FILESIZE = config('MAX_IMAGE_FILESIZE')

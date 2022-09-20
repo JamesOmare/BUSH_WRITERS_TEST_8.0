@@ -1,5 +1,4 @@
-from crypt import methods
-from flask import Blueprint, jsonify, redirect, render_template, request, flash, url_for, current_app
+from flask import Blueprint, jsonify, redirect, render_template, request, flash, url_for
 from .form_fields import RegistrationForm, LoginForm
 from ..models.users import User
 from flask_login import login_user, logout_user, login_required, current_user
@@ -37,33 +36,6 @@ posts = [
         'date_posted': '12 September 1995'
     },
 
-    {
-        'author': 'Melo Dy',
-        'title': 'dawn on a ridge',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 September 1995'
-    },
-
-    {
-        'author': 'Melo Dy',
-        'title': 'dawn on a ridge',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 September 1995'
-    },
-
-    {
-        'author': 'Melo Dy',
-        'title': 'dawn on a ridge',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 September 1995'
-    },
-
-    {
-        'author': 'Melo Dy',
-        'title': 'dawn on a ridge',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 September 1995'
-    },
 ]
 
 
@@ -109,7 +81,7 @@ def register():
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        flash('Your account has been created successfully, you can log in with the registered credentials', 'success')
+        flash('Login successful', 'success')
         return redirect(url_for('main.viewpage'))
 
     login_form = LoginForm()
@@ -117,7 +89,7 @@ def login():
     if request.method == 'POST' and login_form.validate_on_submit():
         email = login_form.email.data
         password = login_form.password.data
-        remmember = login_form.remember.data
+        remember = login_form.remember.data
 
 
         # check if user exists
@@ -125,7 +97,7 @@ def login():
 
         if user:
             if check_password_hash(user.password, password):
-                login_user(user, remmember)
+                login_user(user, remember = remember)
                 flash('Logged in!', 'success')
                 return redirect(url_for('main.viewpage'))
             else:

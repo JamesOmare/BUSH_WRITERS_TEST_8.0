@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <h1>Multi-Step Form </h1>
+    <div id="multi-step-form-container">
+        <!-- Form Steps / Progress Bar -->
+        <ul class="form-stepper form-stepper-horizontal text-center mx-auto pl-0">
+            <!-- Step 1 -->
+            <li class="form-stepper-active text-center form-stepper-list" step="1">
+                <a class="mx-2">
+                    <span class="form-stepper-circle">
+                        <span>1</span>
+                    </span>
+                    <div class="label">Account Basic Details</div>
+                </a>
+            </li>
+            <!-- Step 2 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="2">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>2</span>
+                    </span>
+                    <div class="label text-muted">Seller Profile</div>
+                </a>
+            </li>
+            <!-- Step 3 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="3">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>3</span>
+                    </span>
+                    <div class="label text-muted">Account Description</div>
+                </a>
+            </li>
+        </ul>
+
+
+        <!-- Step Wise Form Content -->
+        <form enctype="multipart/form-data" action="{{ url_for('main.seller') }}" method="POST">
+            {{ form.hidden_tag() }}
+            <!-- Step 1 Content -->
+            <section id="step-1" class="form-step">
+                <h2 class="font-normal">Account Basic Details</h2>
+                <!-- Step 1 input fields -->
+                <div class="mt-3">
+
+                    <!-- Account Name -->
+                    <div class="form-group">
+                        {{ form.account_name.label(class="form-control-label") }}
+                        {% if form.account_name.errors %}
+                            {{ form.account_name(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.account_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.account_name(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <br/>
+
+                    <!-- Account Brand -->
+                    <div class="form-group">
+                        {{ form.account_brand.label(class="form-control-label") }}
+                        {% if form.account_brand.errors %}
+                            {{ form.account_brand(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.account_brand.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.account_brand(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <br/>
+                    
+                    <!-- Account Type section -->
+                    <div class="form-group">
+                        {{ form.account_type.label(class="form-control-label") }}
+                        {% if form.account_type.errors %}
+                            {{ form.account_type(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.account_type.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.account_type(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                      <br/>
+
+                    <!-- Account Creation Date -->
+                    <div class="form-group">
+                        {{ form.account_creation_date.label(class="form-control-label") }}
+                        {% if form.account_creation_date.errors %}
+                            {{ form.account_creation_date(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.account_creation_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.account_creation_date(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div class="mt-3">
+                    <button class="button btn-navigate-form-step" type="button" step_number="2">Next</button>
+                </div>
+            </section>
+
+            <!-- Step 2 Content, default hidden on page load. -->
+            <section id="step-2" class="form-step d-none">
+                <h2 class="font-normal">Seller Profile</h2>
+                <!-- Step 2 input fields -->
+                <div class="mt-3">
+
+                    <!-- Account Price -->
+                    <div class="form-group">
+                        {{ form.account_value.label(class="form-control-label") }}
+                        {% if form.account_value.errors %}
+                            {{ form.account_value(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.account_value.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.account_value(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <br/>
+
+                    <!-- Upload Image -->
+                    <div class="form-group">
+                        {{ form.image.label() }}
+                        {{ form.image(class="form-control-file") }}
+                        {% if form.image.errors %}
+                                {% for error in form.image.errors %}
+                                    <span class="text-danger">{{ error }}</span><br/>
+                                {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="button btn-navigate-form-step" type="button" step_number="1">Prev</button>
+                    <button class="button btn-navigate-form-step" type="button" step_number="3">Next</button>
+                </div>
+            </section>
+            <!-- Step 3 Content, default hidden on page load. -->
+            <section id="step-3" class="form-step d-none">
+                <h2 class="font-normal">Account Description</h2>
+                <!-- Step 3 input fields -->
+                <div class="form-group">
+                    {{ form.account_description.label(class="form-control-label") }}
+                    {% if form.account_description.errors %}
+                        {{ form.account_description(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.account_description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.account_description(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="mt-3">
+                    <button class="button btn-navigate-form-step" type="button" step_number="2">Prev</button>
+                    
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-outline-info") }}
+                    </div>
+                </div>
+            </section>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+{% block sidebar %}
+  <div class="col-md-4">
+    <div class="content-section">
+      <h3>Our Sidebar</h3>
+      <p class='text-muted'>You can put any information here you'd like.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+    </div>
+  </div>
+{% endblock sidebar %}
+  

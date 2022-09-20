@@ -1,4 +1,3 @@
-from sre_parse import FLAGS
 from flask import Flask
 from os import path
 from .config.config import Config
@@ -7,6 +6,7 @@ from .main.views import main
 from.utils import db, migrate, login_manager
 from .models.users import User
 from flask_migrate import Migrate
+
 
 DB_NAME = 'bushwriters.db'
 

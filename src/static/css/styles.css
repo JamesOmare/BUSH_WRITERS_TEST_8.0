@@ -13,8 +13,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar{
-  position: fixed !important;
-  border-radius: 0px !important;
+  /* position: fixed !important;
+  border-radius: 0px !important; */
 }
 
 .grid-title{
@@ -99,4 +99,49 @@ a.article-title:hover {
   position: relative;
   right: 7em;
   background: gainsboro;
+}
+
+.fa-star, .fa-star-half-o {
+  color: gold;
+}
+
+
+/* user profile section  */
+.profile{
+  background: #2f6c6c;
+  border-radius: 12px;
+}
+.img-thumbnail{
+  margin: 12px;
+}
+.profile-head {
+  transform: translateY(5rem)
+}
+
+.profile_section{
+  display: flex;
+  flex-direction: column;
+}
+
+.user_profile{
+  padding-top: 1rem!important;
+}
+
+.rounded{
+  border-radius: 10px;
+}
+
+.custom-top{
+  margin-top: -40px;
+}
+
+.btn-block{
+  margin-bottom: 10px;
+}
+
+.media-body{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px;
 }

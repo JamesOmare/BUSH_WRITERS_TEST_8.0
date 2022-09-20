@@ -15,9 +15,15 @@ class Account(UserMixin ,db.Model):
     __tablename__ = 'accounts'
     account_id = db.Column(db.Integer, primary_key = True)
     account_type = db.Column(db.Enum(AccountType), default = AccountType.ACADEMIC_WRITING_ACCOUNT)
+    account_name = db.Column(db.String(80), nullable = False)
     description = db.Column(db.String(120), nullable = False)
+    brand = db.Column(db.String(60), nullable = False)
     price = db.Column(db.Integer, nullable = False)
-    date_created = db.Column(db.DateTime (timezone = True), default = func.now())
+    image_file = db.Column(db.String(80), nullable=True, default='default.jpg')
+    account_creation_date = db.Column(db.Date, nullable = False)
+    time_posted = db.Column(db.DateTime (timezone = True), default = func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'))
+
 
     def __repr__(self):
-        return '<Accounts %r>' % self.account_type
+        return '<Account %r>' % self.account_type

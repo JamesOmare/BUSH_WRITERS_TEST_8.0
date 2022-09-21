@@ -115,13 +115,28 @@
                 <table class="table table-hover">
                     <tbody>
                         {% for item in account %}                        
-                        <div>
-                            <tr>
-                            <td class="number text-center">{{ loop.index }}</td>
-                            <td class="image"><img src="https://via.placeholder.com/200x100/FF8C00" alt=""></td>
-                            <td class="product"><strong>{{ item.account_type.value | replace("_", "  ") | title }}</strong><br>{{ item.description }}.</td>
-                            <td class="rate text-right"><span><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></span></td>
-                            <td class="price text-right">Ksh {{ item.price }}</td>
+                        <div >
+                            
+                            <tr class="account-section">
+                                <td class="number text-center">{{ loop.index }}</td>
+                                {% set random_no = range(1, 4)|random|string() %}        
+                                {% if item.account_type.value == 'article_account' %}     
+                                <td class="image"><img class="display_image" src="{{url_for('static', filename='images/img/article'+random_no+'.png')}}"/></td>
+                                {% elif item.account_type.value == 'academic_writing_account' %}
+                                <td class="image"><img class="display_image" src="{{url_for('static', filename='images/img/academic'+random_no+'.png')}}"/></td>
+                                {% else %}
+                                <td class="image"><img class="display_image" src="{{url_for('static', filename='images/img/blog'+random_no+'.png')}}"/></td>
+                                {% endif %}
+                                
+                               
+                                <td class="product"><strong class="account-type">{{ item.account_type.value | replace("_", "  ") | title }}</strong><br>
+                                    <div class="description">
+                                        {{ item.description }}
+                                    </div>
+                                    
+                                </td>
+                                <td class="rate text-right"><span><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></span></td>
+                                <td class="price text-right">Ksh {{ item.price }}</td>
                             </tr>
                         </div>
                         {% endfor %}

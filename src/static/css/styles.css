@@ -78,12 +78,12 @@ a.article-title:hover {
   vertical-align: middle;
 }
 
-.account-img {
+/* .account-img {
   height: 125px;
   width: 125px;
   margin-right: 20px;
   margin-bottom: 16px;
-}
+} */
 
 .account-heading {
   font-size: 2.5rem;
@@ -105,6 +105,76 @@ a.article-title:hover {
   color: gold;
 }
 
+/* .row{
+  width: 90vw;
+} */
+
+.table-responsive{
+  width: 63.5vw;
+}
+
+/* Account section */
+.account-section{
+  background: #fff;
+  display: flex;
+  flex-direction: row;
+}
+
+.account-header1{
+  width: 20vw;
+}
+
+.account-header2{
+  width: 20vw;
+}
+
+.account-header3{
+  width: 6vw;
+}
+
+.empty-header1{
+  width: 2vw;
+}
+
+.empty-header2{
+  width: 17vw;
+}
+
+.product{
+  width: 22em;
+}
+
+.account-type{
+  padding: 20px;
+    font-size: x-large;
+}
+
+.description{
+  padding: 20px;
+  font-size: medium;
+  border-radius: 12px;
+  height: 10em;
+  background: #a5b3b730;
+}
+
+.rate{
+  width: 7em;
+}
+
+.price{
+  width: 12.5em;
+  font-size: medium;
+  padding-right: 38px;
+}
+
+/* images in view accounts section */
+
+.display_image{
+  padding: 2px !important;
+  height: 15em;
+  width: 16em;
+  border: solid 4px #000;
+}
 
 /* user profile section  */
 .profile{

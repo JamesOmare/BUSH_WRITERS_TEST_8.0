@@ -85,6 +85,6 @@ def seller():
         db.session.add(account_entry)
         db.session.commit()
 
-        return redirect(url_for("main.user_profile"))
+        return redirect(url_for("main.viewpage"))
 
     return render_template('seller_prompt2.html', form=seller_form)

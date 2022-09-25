@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm, RecaptchaField
-from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, FileField, TextAreaField, SelectField, DateField, IntegerField, MultipleFileField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, FileField, TextAreaField, SelectField, DateField, IntegerField, MultipleFileField, HiddenField, TelField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email, DataRequired, Optional, NumberRange
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from datetime import datetime, date
-
+import phonenumbers
 
 
 class RegistrationForm(FlaskForm):
@@ -20,7 +20,8 @@ class RegistrationForm(FlaskForm):
     email =     EmailField('Email', 
                 validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
 
-    # phone_number = IntegerField
+    # phone = StringField('Phone Number', validators=[DataRequired()])
+    phone = TelField('Phone', validators=[DataRequired()])
 
     password =  PasswordField('Password',
                 validators=[InputRequired(message='Password required'), 
@@ -30,11 +31,20 @@ class RegistrationForm(FlaskForm):
                 validators=[InputRequired(message='Password Required'), 
                 EqualTo('password', message='Passwords must match')])
 
+
     accept_tos = BooleanField('I accept the TOS', [DataRequired(message='You need to check the box to continue')])
 
     recaptcha = RecaptchaField()
 
     submit = SubmitField('Create')
+
+    def validate_phone(self, phone):
+        try:
+            p = phonenumbers.parse(phone.data)
+            if not phonenumbers.is_valid_number(p):
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
+            raise ValidationError('Invalid phone number')
 
 
 class LoginForm(FlaskForm):
@@ -67,16 +77,25 @@ class Seller_Profile_Form(FlaskForm):
 
     account_creation_date = DateField('Date (DD-MM-YYYY)', default=date.today(),  validators=[DataRequired("Please enter the account creation Date."), InputRequired()])
 
-    image = FileField('Update Account Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    # image = MultipleFileField('Upload Account Images ie Screenshots here', [Optional()])
+    # profile = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    
 
     account_value = IntegerField('Account Selling Price', validators=[InputRequired(message='Account price valuation required'), NumberRange(min=1000, max = 20000)], default = 1000)
 
     submit = SubmitField('Update')
 
-    # def validate_date(form, date):
-    #     if date.data < datetime.date.today():
-    #         raise ValidationError("The date cannot be in the past!")
+    def validate_account_creation_date(form, account_creation_date):
+        if account_creation_date.data > date.today():
+            raise ValidationError("The creation date cannot be in the future!")
 
 class Account_Images(FlaskForm):
-    images = MultipleFileField(label='Upload Account Images i.e screenshots', validators=[InputRequired(message='Account Image upload required'), NumberRange(min=1, max = 10)])
-    submit = SubmitField('Upload')
+    # images = MultipleFileField(label='Upload Account Images i.e screenshots', validators=[NumberRange(min=0, max = 10)])
+    images = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+
+class Update_User_Account(FlaskForm):
+    profile_image = FileField('Update Account Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    email =     EmailField('Email', 
+                validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+    phone = StringField('Phone Number', validators=[DataRequired()])
+    submit = SubmitField('Update')

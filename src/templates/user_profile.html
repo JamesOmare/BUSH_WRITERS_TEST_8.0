@@ -34,18 +34,6 @@
                             <i class="fas fa-image mr-1"></i>Account Ads</small
                         >
                     </li>
-                    <li class="list-inline-item">
-                        <h5 class="font-weight-bold mb-0 d-block">745</h5>
-                        <small class="text-muted">
-                            <i class="fas fa-user mr-1"></i>Followers</small
-                        >
-                    </li>
-                    <li class="list-inline-item">
-                        <h5 class="font-weight-bold mb-0 d-block">340</h5>
-                        <small class="text-muted">
-                            <i class="fas fa-user mr-1"></i>Following</small
-                        >
-                    </li>
                 </ul>
             </div>
             <div class="px-4 py-3">
@@ -60,38 +48,34 @@
                 <div
                     class="d-flex align-items-center justify-content-between mb-3"
                 >
-                    <h5 class="mb-0">Recent photos</h5>
+                    <h5 class="mb-0">Recent Accounts Ads</h5>
                     <a href="#" class="btn btn-link text-muted">Show all</a>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6 mb-2 pr-lg-1">
-                        <img
-                            src="https://images.unsplash.com/photo-1469594292607-7bd90f8d3ba4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80"
-                            alt=""
-                            class="img-fluid rounded shadow-sm"
-                        />
-                    </div>
-                    <div class="col-lg-6 mb-2 pl-lg-1">
-                        <img
-                            src="https://images.unsplash.com/photo-1493571716545-b559a19edd14?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80"
-                            alt=""
-                            class="img-fluid rounded shadow-sm"
-                        />
-                    </div>
-                    <div class="col-lg-6 pr-lg-1 mb-2">
-                        <img
-                            src="https://images.unsplash.com/photo-1453791052107-5c843da62d97?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
-                            alt=""
-                            class="img-fluid rounded shadow-sm"
-                        />
-                    </div>
-                    <div class="col-lg-6 pl-lg-1">
-                        <img
-                            src="https://images.unsplash.com/photo-1475724017904-b712052c192a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80"
-                            alt=""
-                            class="img-fluid rounded shadow-sm"
-                        />
-                    </div>
+
+                    {% if accounts %}
+                        {% for item in accounts %}                         
+                        <div class="col-lg-6 mb-2 pr-lg-1">
+                            <div class="card" style="width: 18rem;">
+                                {% set random_no = range(1, 4)|random|string() %}        
+                                {% if item.account_type.value == 'article_account' %} 
+                                <img class="display_image img-fluid rounded shadow-sm" src="{{url_for('static', filename='images/img/article'+random_no+'.png')}}"/>
+                                {% elif item.account_type.value == 'academic_writing_account' %}
+                                <img class="display_image img-fluid rounded shadow-sm" src="{{url_for('static', filename='images/img/academic'+random_no+'.png')}}"/>
+                                {% else %}
+                                <img class="display_image img-fluid rounded shadow-sm" src="{{url_for('static', filename='images/img/blog'+random_no+'.png')}}"/>
+                                {% endif %}
+                                <div class="card-body">
+                                <h5 class="card-title">{{ item.account_type.value | replace("_", "  ") | title }}</h5>
+                                <p class="card-text">{{ item.description }}.</p>
+                                <a href="#" class="btn btn-primary">Ksh {{ item.price }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                            <p>No account add created.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -104,8 +88,20 @@
 {% block sidebar %}
   <div class="col-md-4">
     <div class="content-section">
-      <h3>Our Sidebar</h3>
-      <p class='text-muted'>You can put any information here you'd like.
+      <h3>Sell Account</h3>
+      <p class='text-muted'>Place an add on an account you want to sell.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+
+      <br/>
+
+      <h3>Buy Account</h3>
+      <p class='text-muted'>View marketplace to explore listings on accounts for sale.
         <ul class="list-group">
           <li class="list-group-item list-group-item-light">Latest Posts</li>
           <li class="list-group-item list-group-item-light">Announcements</li>
@@ -115,4 +111,6 @@
       </p>
     </div>
   </div>
+  <br/>
+  
 {% endblock sidebar %}

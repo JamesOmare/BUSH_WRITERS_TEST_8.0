@@ -53,6 +53,7 @@ def register():
             password = reg_form.password.data
             firstname = reg_form.first_name.data
             lastname = reg_form.last_name.data
+            phone_number = reg_form.phone.data
 
             # check if email exists
             email_exists = User.query.filter_by(email=email).first()
@@ -64,7 +65,8 @@ def register():
                 new_user = User(
                     username = firstname + " " + lastname,
                     password = generate_password_hash(password, method='sha256'),
-                    email = email 
+                    email = email,
+                    phone_number = phone_number,
                     )
                 db.session.add(new_user)
                 db.session.commit()
@@ -82,7 +84,7 @@ def register():
 def login():
     if current_user.is_authenticated:
         flash('Login successful', 'success')
-        return redirect(url_for('main.viewpage'))
+        return redirect(url_for('main.user_profile'))
 
     login_form = LoginForm()
 

@@ -4,7 +4,7 @@ import PIL.Image
 from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify, current_app
 from ..models.accounts import Account
 from ..models.images import Image
-from ..auth.form_fields import Seller_Profile_Form
+from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account
 from ..utils import db
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import date
@@ -44,32 +44,24 @@ def save_picture(form_picture):
 
     return picture_fn
 
-# def save_default(form)
+
 
 
 @main.route('/new_seller', methods=['GET', 'POST'])
 @login_required
 def seller():
     seller_form = Seller_Profile_Form()
+    # image_files = Account_Images()
     if request.method == 'POST' and seller_form.validate_on_submit():
         name = seller_form.account_name.data
         brand = seller_form.account_brand.data
         category = seller_form.account_type.data
         description = seller_form.account_description.data
         date = seller_form.account_creation_date.data
-        image = seller_form.image.data
+        # images = image_files.images.data
         price = seller_form.account_value.data
+
         
-
-        if image:
-            secure_file = secure_filename(image.filename)
-            image_file = save_picture(secure_file)
-        else:
-            image_file = None
-
-        if date > date.today():
-            flash("Invalid creation date entered", 'success')
-            return redirect(url_for('main.seller'))
 
         account_entry = Account(
             account_name=name,
@@ -78,13 +70,58 @@ def seller():
             price=price,
             description=description,
             account_creation_date=date,
-            image_file=image_file,
-            user = current_user
+            user = current_user,
+
         )
 
         db.session.add(account_entry)
         db.session.commit()
+        # print('user_email: ',current_user.email, 'image_account_id: ', current_user.account)
+
+        # print(images)
+        # print('current user:',current_user)
+        # if images:
+        #     picture_file = save_picture(images)
+        #     print(picture_file)
+        
+        #     single_entry = Image(
+        #             image_files = picture_file,
+        #             user = current_user,
+        #             account = '2'
+        #         )
+
+        #     db.session.add(single_entry)
+        #     db.session.commit()
+        
+        
+
+        # if images:
+        #     for image in images:
+        #         print('second')
+        #         save_picture(image)
+        #         image_entry = Image(
+        #             image_files = image
+        #         )
+
+        #         db.session.add(image_entry)
+        #     db.session.commit()
+               
+
+        # else:
+        #     image = None
+        #     single_entry = Image(
+        #         image_files = image
+        #     )
+
+        #     db.session.add(single_entry)
+        #     db.session.commit()
+        
 
         return redirect(url_for("main.viewpage"))
 
     return render_template('seller_prompt2.html', form=seller_form)
+
+@main.route('/update', methods = ['GET', 'POST'])
+def update_profile():
+    update_form = Update_User_Account()
+    # if update_form.validate

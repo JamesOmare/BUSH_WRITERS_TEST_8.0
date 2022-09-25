@@ -12,17 +12,17 @@ class AccountType(Enum):
 class Account(UserMixin ,db.Model):
     """Accounts model"""
 
-    __tablename__ = 'accounts'
+    __tablename__ = 'account'
     account_id = db.Column(db.Integer, primary_key = True)
     account_type = db.Column(db.Enum(AccountType), default = AccountType.ACADEMIC_WRITING_ACCOUNT)
     account_name = db.Column(db.String(80), nullable = False)
     description = db.Column(db.String(120), nullable = False)
     brand = db.Column(db.String(60), nullable = False)
     price = db.Column(db.Integer, nullable = False)
-    image_file = db.Column(db.String(80), nullable=True, default='default.jpg')
     account_creation_date = db.Column(db.Date, nullable = False)
     time_posted = db.Column(db.DateTime (timezone = True), default = func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'))
+    images = db.relationship('Image', backref = 'account', passive_deletes = True )
 
 
     def __repr__(self):

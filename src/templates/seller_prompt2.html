@@ -134,17 +134,6 @@
                         {% endif %}
                     </div>
                     <br/>
-
-                    <!-- Upload Image -->
-                    <div class="form-group">
-                        {{ form.image.label() }}
-                        {{ form.image(class="form-control-file") }}
-                        {% if form.image.errors %}
-                                {% for error in form.image.errors %}
-                                    <span class="text-danger">{{ error }}</span><br/>
-                                {% endfor %}
-                        {% endif %}
-                    </div>
                 </div>
                 <div class="mt-3">
                     <button class="button btn-navigate-form-step" type="button" step_number="1">Prev</button>

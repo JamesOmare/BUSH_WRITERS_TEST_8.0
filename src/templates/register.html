@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" integrity="sha512-gxWow8Mo6q6pLa1XH/CcH8JyiSDEtiwJV78E+D+QP0EVasFs8wKXq16G8CLD4CJ2SnonHr4Lm/yY2fSI2+cbmw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <div class="content-section">
         <form action="" method="POST">
             {{ form.csrf_token }}
@@ -53,6 +54,11 @@
                     {% else %}
                         {{ form.email(class="form-control form-control-lg") }}
                     {% endif %}
+                </div>
+
+                <!-- Phone number and country code -->
+                <div class="form-group">
+                   {{ form.phone }}
                 </div>
 
                 <!-- Password 1 field -->
@@ -110,5 +116,53 @@
             Already Have An Account? <a class="ml-2" href="{{ url_for('auth.login') }}">Sign In</a>
         </small>
     </div>
+
+   
 {% endblock content %}
+
+{% block script %}
+<script>
+    function getIp(callback) {
+        fetch('https://ipinfo.io/json?token=e5770c4eb9f7ab', { headers: { 'Accept': 'application/json' }})
+        .then((resp) => resp.json())
+        .catch(() => {
+            return {
+            country: 'ke'
+            };
+        })
+        .then((resp) => {
+            callback(resp.country)
+            console.log(resp.country)
+        });
+        }
+
+    const phoneInputField = document.querySelector("#phone");
+    const phoneInput = window.intlTelInput(phoneInputField, {
+        initialCountry: "auto",
+        preferredCountries: ["ke", "ng", "za", "gh"],
+        geoIpLookup: getIp,
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js",
+    });
+
+    const info = document.querySelector(".alert-info");
+
+    function process(event) {
+    event.preventDefault();
+
+    const phoneNumber = phoneInput.getNumber();
+
+    info.style.display = "";
+    info.innerHTML = `Phone number in E.164 format: <strong>${phoneNumber}</strong>`;
+    }
+</script>
+{% endblock script %}
+    
+{% block script2 %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js" integrity="sha512-+gShyB8GWoOiXNwOlBaYXdLTiZt10Iy6xjACGadpqMs20aJOoh+PJt3bwUVA6Cefe7yF7vblX6QwyXZiVwTWGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock script2 %}
+
+
+
+    
     

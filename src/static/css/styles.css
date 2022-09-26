@@ -223,3 +223,11 @@ a.article-title:hover {
   border: none;
   border-radius: 5px;
 }
+
+.view-btn{
+  margin-left: 80px;
+}
+
+.pr4{
+  padding: 15px;
+}

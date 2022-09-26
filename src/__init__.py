@@ -15,8 +15,10 @@ def create_app(config = Config):
     app.config.from_object(config)
 
     db.init_app(app)
-    migrate.init_app(app)
+    # migrate.init_app(app)
     login_manager.init_app(app)
+
+    migrate = Migrate(app, db)
 
     #register blueprints
     app.register_blueprint(auth)

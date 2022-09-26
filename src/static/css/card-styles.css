@@ -1,0 +1,94 @@
+/*widget css*/
+.color1{
+    background: #00C292;
+}
+.color2{
+    background: #03A9F3;
+}
+.color3{
+    background: #FB7146;
+}
+.card-body{
+    /* display: inline-block;
+    font-family: "Roboto", sans-serif;
+    margin: 10px;
+    padding: 20px;
+    width: 250px;
+    height: 90px;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); */
+
+    display: flex;
+    font-family: "Roboto", sans-serif;
+    margin: 10px;
+    padding: 20px;
+    width: 287px;
+    height: 140px;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgb(0, 0, 0, 0.2);
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.float-left{
+    float: left;
+}
+.float-right{
+    float: right;
+}
+.card-body h3{
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+.currency, .count{
+    font-size: 30px;
+    font-weight: 500;
+}
+.card-body p{
+    font-size: 16px;
+    margin-top: 0;
+}
+.card-body i{
+    font-size: 95px;
+    opacity: 0.5;
+}
+
+/* gallery section */
+img{
+	max-width: 100%;
+}
+.gallery{
+	background-color: #dbddf1;
+    padding: 20px;
+    border-radius: 12px;
+	/* padding: 80px 0; */
+}
+.gallery img{
+	background-color: #ffffff;
+	padding: 15px;
+	width: 100%;
+	box-shadow: 0 0 15px rgba(0,0,0,0.3);
+	cursor: pointer;
+}
+#gallery-modal .modal-img{
+	width: 100%;
+}
+
+/* carousel */
+.carousel-background{
+    background-color: gainsboro;
+    padding: 19px;
+    margin-bottom: 3em;
+    border-radius: 14px;
+    box-shadow: 12px 13px 8px 0 rgb(22 22 26 / 18%);
+}
+  
+/* product content */
+.product-content{
+    width: 44.5em;
+    margin-top: 15px;
+    height: 280%!important;
+}

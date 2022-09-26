@@ -91,11 +91,21 @@ class Seller_Profile_Form(FlaskForm):
 
 class Account_Images(FlaskForm):
     # images = MultipleFileField(label='Upload Account Images i.e screenshots', validators=[NumberRange(min=0, max = 10)])
-    images = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    images = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
 
 class Update_User_Account(FlaskForm):
-    profile_image = FileField('Update Account Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
-    email =     EmailField('Email', 
-                validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+    first_name = StringField('Firstname', 
+                validators=[InputRequired(message='Firstname required'),
+                Length(min=3, max=25, message='First name must be between 3 and 25 characters')])
+
+    last_name = StringField('Lastname', 
+                validators=[InputRequired(message='Username required'),
+                Length(min=3, max=25, message='Last name must be between 3 and 25 characters')])
+
+    profile_image = FileField('Update Account Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
+
+    email =     EmailField('Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+
     phone = StringField('Phone Number', validators=[DataRequired()])
+
     submit = SubmitField('Update')

@@ -23,6 +23,10 @@ def viewpage():
     account = Account.query.all()
     return render_template('view2.html', account=account, logged_in_user=current_user)
 
+@main.route('/product_view')
+def product_view():
+    return render_template('product_view.html')
+
 
 @main.route('/user_profile')
 @login_required
@@ -124,4 +128,29 @@ def seller():
 @main.route('/update', methods = ['GET', 'POST'])
 def update_profile():
     update_form = Update_User_Account()
-    # if update_form.validate
+    if update_form.validate_on_submit():
+        email = update_form.email.data
+        firstname = update_form.first_name.data
+        lastname = update_form.last_name.data
+        phone_number = update_form.phone.data
+        profile_image = update_form.profile_image.data
+        if profile_image:
+            picture_file = save_picture(profile_image)
+            current_user.profile_photo = picture_file
+        current_user.username = firstname + " " + lastname
+        current_user.email = email
+        current_user.phone_number = phone_number
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('main.user_profile'))
+    elif request.method == 'GET':
+        my_username = fr"{current_user.username}"
+        first_name, last_name = my_username.split()
+        update_form.first_name.data = first_name
+        update_form.last_name.data = last_name
+        update_form.email.data = current_user.email
+        update_form.phone.data = current_user.phone_number
+        update_form.profile_image.data = current_user.profile_photo
+    image_file = url_for('static', filename='images/profile_pics/' + current_user.profile_photo)
+    return render_template('update_account_form.html', title='Account',
+                           image_file=image_file, form=update_form)

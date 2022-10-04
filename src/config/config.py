@@ -10,3 +10,7 @@ class Config(object):
     RECAPTCHA_PUBLIC_KEY = config('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
     MAX_IMAGE_FILESIZE = config('MAX_IMAGE_FILESIZE')
+    # Fluid layout True or False
+    FLASK_ADMIN_FLUID_LAYOUT = True
+    # Set the theme name
+    FLASK_ADMIN_SWATCH = 'flatly'

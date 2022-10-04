@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
+{% block navbar %}
+{% if notification == true %}
+    
+    <a class="nav-item nav-link rounded" style="background-color: #2f6c6c;" href="{{ url_for('main.chat', id=current_user.id) }}">
+    <button type="button" class="btn rounded position-relative">
+        <i class="bi bi-bell"></i>
+        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+    </button>
+    </a> 
+   
+{% endif %}
+{% endblock navbar%}
+
+
+    
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/success_prompt.css') }}" >
 <div class="row py-5 px-4 user_profile">
@@ -27,13 +42,32 @@
                 </div>
             </div>
             <div class="bg-light p-4 d-flex justify-content-end text-center">
-                <ul class="list-inline mb-0">
+                <ul class="list-inline mb-0 nav-container1">
                     <li class="list-inline-item">          
                         <h5 class="font-weight-bold mb-0 d-block">{{ accounts | count }}</h5>
                         <small class="text-muted">
                             <i class="fas fa-image mr-1"></i>Account Ads</small
                         >
                     </li>
+                    {% if notification == false %}
+                    <li class="list-inline-item">          
+                        <a class="nav-item nav-link rounded" style="background-color: #2f6c6c;" href="{{ url_for('main.chat', id=current_user.id) }}">
+                            <button type="button" class="btn rounded position-relative">
+                                <i class="bi bi-bell bi-lg"></i>
+                            </button>
+                            </a> 
+                    </li>   
+                    
+                    {% else %}
+                    <li class="list-inline-item">          
+                        <a class="nav-item nav-link rounded" style="background-color: #2f6c6c;" href="{{ url_for('main.chat', id=current_user.id) }}">
+                            <button type="button" class="btn rounded position-relative">
+                                <i class="bi bi-bell bi-lg"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                            </button>
+                            </a> 
+                    </li>   
+                    {% endif %}
                 </ul>
             </div>
             <div class="px-4 py-3">
@@ -110,6 +144,20 @@
           <li class="list-group-item list-group-item-light">etc</li>
         </ul>
       </p>
+      <br/>
+
+      <h3>Chat Application</h3>
+      
+
+      <p class='text-muted'>Place an add on an account you want to sell.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+
     </div>
   </div>
   <br/>

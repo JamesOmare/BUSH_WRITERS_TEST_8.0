@@ -1,0 +1,80 @@
+{% extends 'admin/master.html' %}
+
+
+{% block body %}
+
+<form action="" method="POST">
+    {{ form.csrf_token }}
+    {{ form.hidden_tag() }}
+    <fieldset>
+      <legend>Form</legend>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        {{ form.ac_login_email.label(class="form-control-label") }}
+        {% if form.ac_login_email.errors %}
+            {{ form.ac_login_email(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.ac_login_email.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.ac_login_email(class="form-control form-control-lg") }}
+        {% endif %}
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+
+    <!-- Password Field -->
+    <div class="form-group">
+      {{ form.ac_login_pass.label(class="form-control-label") }}
+      {% if form.ac_login_pass.errors %}
+          {{ form.ac_login_pass(class="form-control form-control-lg is-invalid") }}
+          <div class="invalid-feedback">
+              {% for error in form.ac_login_pass.errors %}
+                  <span>{{ error }}</span>
+              {% endfor %}
+          </div>
+      {% else %}
+          {{ form.ac_login_pass(class="form-control form-control-lg") }}
+      {% endif %}
+      <small id="emailHelp" class="form-text text-muted">We'll never share your password with anyone else.</small>
+    </div>
+
+    <!-- User ID -->
+    <div class="form-group">
+        {{ form.user_id.label(class="form-control-label") }}
+        {% if form.user_id.errors %}
+            {{ form.user_id(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.user_id.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.user_id(class="form-control form-control-lg") }}
+        {% endif %}
+    </div>
+
+    <!-- Account ID -->
+    <div class="form-group">
+        {{ form.account_id.label(class="form-control-label") }}
+        {% if form.account_id.errors %}
+            {{ form.account_id(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.account_id.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.account_id(class="form-control form-control-lg") }}
+        {% endif %}
+    </div>
+      
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+    </fieldset>
+  </form>
+{% endblock body %}
+    

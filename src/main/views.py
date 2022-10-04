@@ -3,12 +3,16 @@ import secrets
 import PIL.Image
 from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify, current_app
 from ..models.accounts import Account
+from ..models.users import User
+from ..models.messages import Message
+from ..models.complaints import Complaints
 from ..models.images import Image
-from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account
+from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account, Complaint
 from ..utils import db
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import date
 from werkzeug.utils import secure_filename
+
 
 main = Blueprint('main', __name__)
 
@@ -28,11 +32,26 @@ def product_view():
     return render_template('product_view.html')
 
 
-@main.route('/user_profile')
+@main.route('/user_profile/<id>')
 @login_required
-def user_profile():
-    accounts = Account.query.filter_by(user_id = current_user.id).all()
-    return render_template('user_profile.html', accounts = accounts, account_holder = current_user)
+def user_profile(id):
+    user = User.query.filter_by(id = id).first()
+    msg = Message.query.filter_by(user_id = id).first()
+
+    # if msg:
+    #     notification = True
+    # else:
+    #     notification = False
+    notification = True if msg else False
+
+    if current_user.id != user.id:
+        flash('You do not have permission to enter this page', category='error')
+        return redirect(url_for('auth.login'))
+    else:
+        accounts = Account.query.filter_by(user_id = current_user.id).all()
+        print(notification)
+        return render_template('user_profile.html', accounts = accounts, account_holder = current_user, notification = notification)
+  
 
 
 def save_picture(form_picture):
@@ -154,3 +173,38 @@ def update_profile():
     image_file = url_for('static', filename='images/profile_pics/' + current_user.profile_photo)
     return render_template('update_account_form.html', title='Account',
                            image_file=image_file, form=update_form)
+
+
+@main.route('/chat_page/<id>', methods = ['GET', 'POST'])
+def chat(id):
+    msg = Message.query.filter_by(user_id = id).all()
+    form = Complaint()
+    if msg:
+        if request.method == 'POST' and form.validate_on_submit():
+            user_number = form.buyer_phone_number.data
+            seller_number = form.seller_phone_number.data
+            reason = form.reason.data
+            extended_reason = form.extended_reason.data
+
+            if not extended_reason:
+                extended_reason = None
+
+            complaint_entry = Complaints(
+                user_id = current_user.id,
+                buyer_number = user_number,
+                seller_number = seller_number,
+                reason = reason,
+                further_description = extended_reason
+            )
+
+            db.session.add(complaint_entry)
+            db.session.commit()
+            flash('Successfully sent complaint to admin, purchase status updated!', 'success')
+
+            return render_template('chat.html', msg = msg, form = form)
+        else:
+            return render_template('chat.html', msg = msg, form = form)
+
+    else:
+        return render_template('chat.html')
+    

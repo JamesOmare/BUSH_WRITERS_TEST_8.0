@@ -104,8 +104,30 @@ class Update_User_Account(FlaskForm):
 
     profile_image = FileField('Update Account Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
 
-    email =     EmailField('Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+    email = EmailField('Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
 
     phone = StringField('Phone Number', validators=[DataRequired()])
 
     submit = SubmitField('Update')
+
+class AdminForm(FlaskForm):
+    ac_login_email = EmailField('Account Login Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+    ac_login_pass = StringField('Account Login Password', 
+                validators=[InputRequired(message='Input required'),
+                Length(min=3, max=25, message='The password must be between 3 and 25 characters')])
+    user_id = IntegerField('User ID', validators=[InputRequired(message='User ID required'), NumberRange(min=1)])
+    account_id = IntegerField('Account ID', validators=[InputRequired(message='Account ID required'), NumberRange(min=1)])
+
+    submit = SubmitField('Send')
+
+class Complaint(FlaskForm):
+    buyer_phone_number = IntegerField('Enter your phone number', validators=[InputRequired(message='Phone number required required')])
+    seller_phone_number = IntegerField('Enter seller\'s phone number', validators=[InputRequired(message='Phone number required required')])
+    reason = SelectField('Select Reason', choices=[('Account Advertised was misleading'), ('Account credentials are incorrect'), ('Account is suspended'), ("Other reasons(can expound further below)")])
+    extended_reason = TextAreaField('Further Description on the account problem(Optional)', [Optional(), Length(max=250)])
+    submit = SubmitField("Reject")
+
+
+
+
+

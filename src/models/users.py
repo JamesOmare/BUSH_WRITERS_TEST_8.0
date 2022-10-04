@@ -2,6 +2,7 @@ from enum import unique
 from ..utils import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from flask_admin.contrib.sqla import ModelView
 
 
 class User(UserMixin ,db.Model):
@@ -15,8 +16,13 @@ class User(UserMixin ,db.Model):
     password = db.Column(db.String(150), nullable = False)
     profile_photo = db.Column(db.String(80), nullable=True, default='default_profile.gif')
     date_created = db.Column(db.DateTime (timezone = True), default = func.now())
+    active = db.Column(db.Boolean, default=True)
+    admin = db.Column(db.Boolean(), default=False) 
     account = db.relationship('Account', backref = 'user', passive_deletes = True)
     images = db.relationship('Image', backref = 'user', passive_deletes = True )
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+    def is_admin(self): 
+        return self.admin

@@ -1,47 +1,19 @@
-from flask import Blueprint, jsonify, redirect, render_template, request, flash, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, flash, url_for, abort
 from .form_fields import RegistrationForm, LoginForm
 from ..models.users import User
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..utils import db
+from flask_admin import BaseView, expose 
 
 auth = Blueprint('auth', __name__)
 
-posts = [
-    {
-        'author': 'john faulk',
-        'title': 'little birds',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 March 2005'
-    },
-
-    {
-        'author': 'peter faulk',
-        'title': 'A quiet place',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '18 Julu 1896'
-    },
-
-    {
-        'author': 'authur faulk',
-        'title': 'dawn on a ridge',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 September 1995'
-    },
-
-    {
-        'author': 'Melo Dy',
-        'title': 'dawn on a ridge',
-        'content': 'Wait wait wait for me, please wait around i\'ll see you when i fall asleep',
-        'date_posted': '12 September 1995'
-    },
-
-]
-
-
-@auth.route('/home')
-def home():
-    return render_template('home.html', posts=posts)
+class HelloView(BaseView): 
+    @expose('/') 
+    def index(self): 
+        return self.render('some-template.html') 
+    def is_accessible(self): 
+        return current_user.is_authenticated and current_user.is_admin()
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
@@ -114,3 +86,4 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+

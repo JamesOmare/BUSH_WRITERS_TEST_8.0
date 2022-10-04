@@ -1,0 +1,39 @@
+{% extends 'admin/master.html' %}
+
+{% block menu_links %}
+<button type="button" class="btn btn-primary">Verification Stage<span class="badge badge-warning badge-pill">14</span></button>
+<button type="button" class="btn btn-info">On Progress<span class="badge badge-warning badge-pill">14</span></button>
+<button type="button" class="btn btn-success">Success<span class="badge badge-warning badge-pill">14</span></button>
+<button type="button" class="btn btn-danger">Disputed<span class="badge badge-warning badge-pill">14</span></button>
+
+{% endblock %}
+
+{% block body %}
+<a href="/admin/notificationview/second_page">Enter second page</a>
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      Cras justo odio
+      <span class="badge badge-primary badge-pill">14</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      Dapibus ac facilisis in
+      <span class="badge badge-primary badge-pill">2</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      Morbi leo risus
+      <span class="badge badge-primary badge-pill">1</span>
+    </li>
+  </ul>
+
+<div class="jumbotron">
+    <h1 class="display-3">Hello, world!</h1>
+    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+    <hr class="my-4">
+    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+    <p class="lead">
+      <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+    </p>
+  </div>
+
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'admin/model/edit.html' %}
+
+{% block tail %}
+{{ super() }}
+<script>
+    (function ($) {
+
+        function safeConfirm(msg) {
+            try {
+                var isconfirmed = confirm(msg);
+                if (isconfirmed == true) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            catch (err) {
+                return false;
+            }
+        }
+
+        $('form:first').on('submit', function () {    
+            return safeConfirm('{{ _gettext("Are you sure you want to save this record?") }}');
+        });
+
+    })(jQuery);
+
+</script>
+{% endblock %}

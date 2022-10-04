@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block navbar %}
+
+{% endblock%}
+    
+{% block content %}
+
+
+        <main>
+        <div class="container py-4">
+          <header class="pb-3 mb-4 border-bottom">
+            <i class="bi bi-bell-fill bi-lg" style="font-size:24px;"></i>
+              <span class="fs-4">Notifications Page</span>
+            </a>
+          </header>
+    {% if msg %}
+
+    {% for item in msg %}
+          <div class="fm-content">
+            <form>
+              <fieldset disabled>
+                  <div class="mb-3 title-time-display">
+                      <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                      <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                    </div>
+                <div class="mb-3">
+                  <label for="disabledTextInput" class="form-label text-white">Account Email</label>
+                  <input type="text" id="account-val" value="{{item.login_email}}" class="form-control" placeholder="Disabled input">
+                </div>
+                <div class="mb-3">
+                  <label for="disabledTextInput" class="form-label text-white">Account Password</label>
+                  <input type="text" id="account-val" value="{{item.login_password}}" class="form-control" placeholder="Disabled input">
+                </div>
+              </fieldset>
+              <br/>
+              <div class="mb-3 text-white">
+              <p class="text">
+                  <i class="bi bi-exclamation-triangle"></i>
+                  You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                  
+                  <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                  
+                  <input class="btn btn-primary" type="submit" value="Confirm">
+                  <br/>
+                  <span class="moreText"> assumenda sapiente expedita labore atque! Sint.</span></p>
+                  
+              </div> 
+            </form>
+
+            <form action="" method="POST">
+              {{ form.csrf_token }}
+              {{ form.hidden_tag() }}
+                  <!-- Buyer phone number -->
+                  <div class="form-group">
+                    {{ form.buyer_phone_number.label(class="form-control-label text-white") }}
+                    {% if form.buyer_phone_number.errors %}
+                        {{ form.buyer_phone_number(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.buyer_phone_number.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.buyer_phone_number(class="form-control form-control-lg") }}
+                    {% endif %}
+                  </div>
+
+                  <!-- Seller phone number -->
+                  <div class="form-group">
+                    {{ form.seller_phone_number.label(class="form-control-label text-white") }}
+                    {% if form.seller_phone_number.errors %}
+                        {{ form.userseller_phone_number_id(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.seller_phone_number.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.seller_phone_number(class="form-control form-control-lg") }}
+                    {% endif %}
+                  </div>
+
+                  <!-- Reason -->
+                  <div class="form-group">
+                    {{ form.reason.label(class="form-control-label text-white") }}
+                    {% if form.reason.errors %}
+                        {{ form.reason(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.reason.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.reason(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <!-- Extended Description -->
+                <div class="form-group">
+                  {{ form.extended_reason.label(class="form-control-label text-white") }}
+                  {% if form.extended_reason.errors %}
+                      {{ form.extended_reason(class="form-control form-control-lg is-invalid") }}
+                      <div class="invalid-feedback">
+                          {% for error in form.extended_reason.errors %}
+                              <span>{{ error }}</span>
+                          {% endfor %}
+                      </div>
+                  {% else %}
+                      {{ form.extended_reason(class="form-control form-control-lg") }}
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  {{ form.submit(class="btn btn-danger mt-3") }}
+                </div>
+
+            </form>
+          </div>
+       
+      <br>
+    {% endfor %}
+        
+  {% else %}
+    <p>You have no notifications.</p>
+    <input type="button" class="btn btn-dark" value="Go back!" onclick="history.back()">
+      
+  {% endif %}
+</div>
+</main>
+
+    
+{% endblock content %}
+
+{% block sidebar %}
+  <div class="col-md-4">
+    <div class="content-section">
+      <h3>Sell Account</h3>
+      <p class='text-muted'>Place an add on an account you want to sell.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+
+      <br/>
+
+      <h3>Buy Account</h3>
+      <p class='text-muted'>View marketplace to explore listings on accounts for sale.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+      <br/>
+
+      <h3>Chat Application</h3>
+      
+
+      <p class='text-muted'>Place an add on an account you want to sell.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+
+    </div>
+  </div>
+  <br/>
+
+{% endblock sidebar %}
+
+<script>
+  const readMoreBtn = document.querySelector(".btn-danger");
+  const text = document.querySelector(".text");
+
+  readMoreBtn.addEventListener("click", (e) => {
+    text.classList.toggle("show-more");
+    if (readMoreBtn.innerText === "Read More") {
+      readMoreBtn.innerText = "Read Less";
+    } else {
+      readMoreBtn.innerText = "Read More";
+    }
+  });
+</script>

@@ -77,7 +77,7 @@ class Seller_Profile_Form(FlaskForm):
 
     account_creation_date = DateField('Date (DD-MM-YYYY)', default=date.today(),  validators=[DataRequired("Please enter the account creation Date."), InputRequired()])
 
-    # image = MultipleFileField('Upload Account Images ie Screenshots here', [Optional()])
+    images = MultipleFileField('Upload Account Images ie Screenshots here', [Optional()], render_kw={'multiple': True})
     # profile = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     
 

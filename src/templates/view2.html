@@ -136,8 +136,16 @@
                                     
                                 </td>
                                 <td class="rate text-right"><span><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></span></td>
-                                <td class="price text-right">Ksh {{ item.price }}</td>
+                                <td class="price text-right">Ksh {{ item.price }}
+                                    <div class="list-btns">
+                                        <input type="button" value="purchase" class="btn btn-success">
+                                        <input type="button" value="view" class="btn btn-primary">
+                                    </div>
+                                    
+                                </td>
+                                
                             </tr>
+                            
                         </div>
                         {% endfor %}
                         

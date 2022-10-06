@@ -1,5 +1,6 @@
 import os
 import secrets
+import uuid
 import PIL.Image
 from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify, current_app
 from ..models.accounts import Account
@@ -10,6 +11,7 @@ from ..models.images import Image
 from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account, Complaint
 from ..utils import db
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy import and_, desc,asc
 from datetime import date
 from werkzeug.utils import secure_filename
 
@@ -54,7 +56,7 @@ def user_profile(id):
   
 
 
-def save_picture(form_picture):
+def save_picture_thumbnail(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
@@ -67,6 +69,18 @@ def save_picture(form_picture):
 
     return picture_fn
 
+def save_pictures(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(current_app.root_path, 'static/images/account_images', picture_fn)
+
+    img = PIL.Image.open(form_picture)
+    img.save(picture_path)
+
+    return picture_fn
+
+
 
 
 
@@ -74,14 +88,14 @@ def save_picture(form_picture):
 @login_required
 def seller():
     seller_form = Seller_Profile_Form()
-    # image_files = Account_Images()
+    
     if request.method == 'POST' and seller_form.validate_on_submit():
         name = seller_form.account_name.data
         brand = seller_form.account_brand.data
         category = seller_form.account_type.data
         description = seller_form.account_description.data
         date = seller_form.account_creation_date.data
-        # images = image_files.images.data
+        images = seller_form.images.data
         price = seller_form.account_value.data
 
         
@@ -99,45 +113,23 @@ def seller():
 
         db.session.add(account_entry)
         db.session.commit()
-        # print('user_email: ',current_user.email, 'image_account_id: ', current_user.account)
+       
+        latest_ac = Account.query.filter_by(user_id = current_user.id).order_by(Account.time_posted.asc()).first()
+        print(latest_ac)
 
-        # print(images)
-        # print('current user:',current_user)
-        # if images:
-        #     picture_file = save_picture(images)
-        #     print(picture_file)
-        
-        #     single_entry = Image(
-        #             image_files = picture_file,
-        #             user = current_user,
-        #             account = '2'
-        #         )
+        if images:
+            for image in images:
+                # Filter Image
+                image_file = save_pictures(image)
 
-        #     db.session.add(single_entry)
-        #     db.session.commit()
-        
-        
-
-        # if images:
-        #     for image in images:
-        #         print('second')
-        #         save_picture(image)
-        #         image_entry = Image(
-        #             image_files = image
-        #         )
-
-        #         db.session.add(image_entry)
-        #     db.session.commit()
-               
-
-        # else:
-        #     image = None
-        #     single_entry = Image(
-        #         image_files = image
-        #     )
-
-        #     db.session.add(single_entry)
-        #     db.session.commit()
+                # Save record
+                image_entry = Image(
+                    image_files = image_file,
+                    user_id = current_user.id,
+                    account_id = latest_ac.account_id
+                )
+                db.session.add(image_entry)
+            db.session.commit()
         
 
         return redirect(url_for("main.viewpage"))
@@ -154,14 +146,14 @@ def update_profile():
         phone_number = update_form.phone.data
         profile_image = update_form.profile_image.data
         if profile_image:
-            picture_file = save_picture(profile_image)
+            picture_file = save_picture_thumbnail(profile_image)
             current_user.profile_photo = picture_file
         current_user.username = firstname + " " + lastname
         current_user.email = email
         current_user.phone_number = phone_number
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('main.user_profile'))
+        return redirect(url_for('main.user_profile', id = current_user.id))
     elif request.method == 'GET':
         my_username = fr"{current_user.username}"
         first_name, last_name = my_username.split()

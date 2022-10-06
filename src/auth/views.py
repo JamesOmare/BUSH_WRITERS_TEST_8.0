@@ -21,6 +21,7 @@ def register():
     reg_form = RegistrationForm()
 
     if request.method == 'POST' and reg_form.validate_on_submit():
+            print('validated -----------------')
             email = reg_form.email.data
             password = reg_form.password.data
             firstname = reg_form.first_name.data
@@ -56,7 +57,7 @@ def register():
 def login():
     if current_user.is_authenticated:
         flash('Login successful', 'success')
-        return redirect(url_for('main.user_profile'))
+        return redirect(url_for('main.user_profile', id = current_user.id))
 
     login_form = LoginForm()
 
@@ -73,7 +74,7 @@ def login():
             if check_password_hash(user.password, password):
                 login_user(user, remember = remember)
                 flash('Logged in!', 'success')
-                return redirect(url_for('main.viewpage'))
+                return redirect(url_for('main.viewpage', id = current_user.id))
             else:
                 flash('Username or Password is incorrect!', 'error')
         

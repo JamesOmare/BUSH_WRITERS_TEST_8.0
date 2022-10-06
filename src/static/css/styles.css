@@ -13,8 +13,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar{
-  /* position: fixed !important;
-  border-radius: 0px !important; */
+  /* position: fixed !important; */
+  border-radius: 0px !important; 
+}
+
+.price{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
 }
 
 .grid-title{

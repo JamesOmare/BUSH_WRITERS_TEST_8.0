@@ -144,6 +144,8 @@
             <section id="step-3" class="form-step d-none">
                 <h2 class="font-normal">Account Description</h2>
                 <!-- Step 3 input fields -->
+
+                <!-- Account Description -->
                 <div class="form-group">
                     {{ form.account_description.label(class="form-control-label") }}
                     {% if form.account_description.errors %}
@@ -157,6 +159,22 @@
                         {{ form.account_description(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
+
+                <!-- Account Images upload -->
+                <div class="form-group">
+                    {{ form.images.label(class="form-control-label") }}
+                    {% if form.images.errors %}
+                        {{ form.images(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.images.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.images(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
                 <div class="mt-3">
                     <button class="button btn-navigate-form-step" type="button" step_number="2">Prev</button>
                     

@@ -11,6 +11,7 @@ from flask_admin.actions import action
 from sqlalchemy.sql import func
 from ..auth.form_fields import AdminForm
 from ..models.messages import Message
+from ..models.complaints import Complaints
 
 # class AdminAuthentication(object):
 #     def is_accessible(self):
@@ -21,10 +22,10 @@ from ..models.messages import Message
 
 
 
-class IndexView(AdminIndexView):
-    @expose('/')
-    def index(self):
-        return self.render('admin/index.html')
+# class IndexView(AdminIndexView):
+#     @expose('/')
+#     def index(self):
+#         return self.render('admin/index.html')
 
 class OnProgressView(ModelView):
     can_delete = False
@@ -202,6 +203,15 @@ class DisputedView(ModelView):
     def get_count_query(self):
       return self.session.query(func.count('*')).filter(self.model.status==4)
 
+    @expose('/claims')
+    # @login_required
+    # @has_role('admin')
+    def second_page(self):
+        complaints = Complaints.query.all()
+        if not complaints:
+            complaints = None
+        return self.render('admin/complaint_claims.html', claims = complaints)
+
 
 # class UserView(ModelView):
 #     @action('approve', 'Approve', 'Are you sure you want to approve selected users?')
@@ -224,10 +234,10 @@ class DisputedView(ModelView):
 
 #             flash(gettext('Failed to approve users. %(error)s', error=str(ex)), 'error')
 
-class MyView(BaseView):
-    @expose('/')
-    def index(self):
-        return 'Hello World!'
+# class MyView(BaseView):
+#     @expose('/')
+#     def index(self):
+#         return 'Hello World!'
 
 class NotificationView(BaseView):
     @expose('/')
@@ -326,4 +336,3 @@ admin.add_view(OnProgressView(Account, db.session, name='On Progress', endpoint=
 admin.add_view(VerificationView(Account, db.session, name='Verification Pending', endpoint="pending_verification"))
 admin.add_view(SucessView(Account, db.session, name='Successful', endpoint="success"))
 admin.add_view(DisputedView(Account, db.session, name='Disputed', endpoint="disputed"))
-

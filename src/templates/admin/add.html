@@ -3,7 +3,7 @@
 
 {% block menu_links %}
 
-<button type="button" class="btn btn-danger"><i class="fa fa-bell fa-fw"></i><span class="badge badge-warning badge-pill">{{ number }}</span></button>
+<button type="button" class="btn btn-danger" href="{{ url_for('admin.static', filename='complaint_claims.html') }}"><i class="fa fa-bell fa-fw"></i><span class="badge badge-warning badge-pill">{{ number }}</span></button>
 
 {% endblock %}
 
@@ -14,9 +14,13 @@
         <div class="card-header">{{ number }}</div>
         <div class="card-body">
           <h4 class="card-title">Success card title</h4>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.
+            <a href="/admin/disputed/claims" class="text-white">click here</a>
+          </p>
+          
         </div>
       </div>
       
 {% endblock %}
+
 

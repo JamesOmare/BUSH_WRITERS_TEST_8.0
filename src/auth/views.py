@@ -21,7 +21,6 @@ def register():
     reg_form = RegistrationForm()
 
     if request.method == 'POST' and reg_form.validate_on_submit():
-            print('validated -----------------')
             email = reg_form.email.data
             password = reg_form.password.data
             firstname = reg_form.first_name.data

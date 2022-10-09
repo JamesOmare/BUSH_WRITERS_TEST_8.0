@@ -29,9 +29,13 @@ def viewpage():
     account = Account.query.all()
     return render_template('view2.html', account=account, logged_in_user=current_user)
 
-@main.route('/product_view')
-def product_view():
-    return render_template('product_view.html')
+@main.route('/product_view/<item_id>')
+def product_view(item_id):
+    account = Account.query.filter_by(account_id = item_id).first()
+    images = Image.query.filter_by(account_id = item_id).all()
+
+    # print("Account ID: ",current_user.account_id)
+    return render_template('product_view.html', account = account, images = images)
 
 
 @main.route('/user_profile/<id>')
@@ -51,7 +55,6 @@ def user_profile(id):
         return redirect(url_for('auth.login'))
     else:
         accounts = Account.query.filter_by(user_id = current_user.id).all()
-        print(notification)
         return render_template('user_profile.html', accounts = accounts, account_holder = current_user, notification = notification)
   
 
@@ -115,8 +118,7 @@ def seller():
         db.session.commit()
        
         latest_ac = Account.query.filter_by(user_id = current_user.id).order_by(Account.time_posted.asc()).first()
-        print(latest_ac)
-
+        
         if images:
             for image in images:
                 # Filter Image

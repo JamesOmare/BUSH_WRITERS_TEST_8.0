@@ -103,7 +103,7 @@
                                 <h5 class="card-title">{{ item.account_type.value | replace("_", "  ") | title }}</h5>
                                 <p class="card-text">{{ item.description }}.</p>
                                 <a href="#" class="btn btn-primary">Ksh {{ item.price }}</a>
-                                <a href="/product_view" class="btn btn-primary view-btn">View</a>
+                                <a href="{{url_for('main.product_view', item_id=item.account_id)}}" class="btn btn-primary view-btn">View</a>
                                 </div>
                             </div>
                         </div>

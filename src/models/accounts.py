@@ -30,8 +30,8 @@ class Account(db.Model):
     account_creation_date = db.Column(db.Date, nullable = False)
     time_posted = db.Column(db.DateTime (timezone = True), default = func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'))
-    images = db.relationship('Image', backref = 'account', passive_deletes = True )
+    images = db.relationship('Image', backref = 'account', passive_deletes = True, lazy='dynamic' )
 
 
     def __repr__(self):
-        return '<Account %r>' % self.account_type
+        return '<Account %r>' % self.account_name

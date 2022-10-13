@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 
+
+{% block stylesheets %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" >
+    
+{% endblock stylesheets %}
+    
+
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" integrity="sha512-gxWow8Mo6q6pLa1XH/CcH8JyiSDEtiwJV78E+D+QP0EVasFs8wKXq16G8CLD4CJ2SnonHr4Lm/yY2fSI2+cbmw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <div class="content-section">
@@ -120,7 +129,7 @@
    
 {% endblock content %}
 
-{% block script %}
+{% block scripts %}
 <script>
     function getIp(callback) {
         fetch('https://ipinfo.io/json?token=e5770c4eb9f7ab', { headers: { 'Accept': 'application/json' }})
@@ -156,11 +165,11 @@
     info.innerHTML = `Phone number in E.164 format: <strong>${phoneNumber}</strong>`;
     }
 </script>
-{% endblock script %}
-    
-{% block script2 %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js" integrity="sha512-+gShyB8GWoOiXNwOlBaYXdLTiZt10Iy6xjACGadpqMs20aJOoh+PJt3bwUVA6Cefe7yF7vblX6QwyXZiVwTWGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-{% endblock script2 %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+
+{% endblock scripts %}
 
 
 

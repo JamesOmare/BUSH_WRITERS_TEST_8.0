@@ -8,7 +8,7 @@ from ..models.users import User
 from ..models.messages import Message
 from ..models.complaints import Complaints
 from ..models.images import Image
-from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account, Complaint
+from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account, Payment_Dropdown, Complaint
 from ..utils import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import and_, desc,asc
@@ -24,10 +24,15 @@ def homepage():
     return render_template('view.html')
 
 
-@main.route('/')
+@main.route('/', methods = ['GET', 'POST'])
 def viewpage():
-    account = Account.query.all()
-    return render_template('view2.html', account=account, logged_in_user=current_user)
+    form = Payment_Dropdown()
+    account = Account.query.filter_by(status = 0)
+   
+    if request.method == 'POST' and form.validate_on_submit():
+        account_id = form.info.data
+        return redirect(url_for('main.payment', product_id = account_id))
+    return render_template('view2.html', account=account, logged_in_user=current_user, form = form)
 
 @main.route('/product_view/<item_id>')
 def product_view(item_id):
@@ -202,3 +207,12 @@ def chat(id):
     else:
         return render_template('chat.html')
     
+@main.route('/payment/<product_id>', methods = ['GET', 'POST'])
+def payment(product_id):
+    account = Account.query.filter_by(account_id = product_id).first()
+    
+    return render_template('payment.html', account = account)
+
+
+# '@main.route('/on_progress/<product_id>')
+# def on_progress():

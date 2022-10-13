@@ -87,13 +87,6 @@ a.article-title:hover {
   vertical-align: middle;
 }
 
-/* .account-img {
-  height: 125px;
-  width: 125px;
-  margin-right: 20px;
-  margin-bottom: 16px;
-} */
-
 .account-heading {
   font-size: 2.5rem;
 }
@@ -114,12 +107,14 @@ a.article-title:hover {
   color: gold;
 }
 
-/* .row{
-  width: 90vw;
-} */
-
 .table-responsive{
   width: 63.5vw;
+}
+
+.list-btns{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly
 }
 
 /* Account section */
@@ -280,3 +275,7 @@ a.article-title:hover {
   padding: 10px;
 }
 
+/* modal */
+.list-payment{
+  left: 12em;
+}

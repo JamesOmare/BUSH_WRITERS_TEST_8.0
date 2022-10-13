@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm, RecaptchaField
-from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, FileField, TextAreaField, SelectField, DateField, IntegerField, MultipleFileField, HiddenField, TelField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, FileField, TextAreaField, SelectField, DateField, IntegerField, MultipleFileField, HiddenField, TelField, HiddenField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email, DataRequired, Optional, NumberRange
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from datetime import datetime, date
@@ -127,7 +127,9 @@ class Complaint(FlaskForm):
     extended_reason = TextAreaField('Further Description on the account problem(Optional)', [Optional(), Length(max=250)])
     submit = SubmitField("Reject")
 
-
+class Payment_Dropdown(FlaskForm):
+    info = HiddenField()
+    submit = SubmitField("Leave To Checkout")
 
 
 

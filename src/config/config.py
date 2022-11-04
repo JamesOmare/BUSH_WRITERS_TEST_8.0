@@ -10,6 +10,11 @@ class Config(object):
     RECAPTCHA_PUBLIC_KEY = config('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
     MAX_IMAGE_FILESIZE = config('MAX_IMAGE_FILESIZE')
+    MAIL_SERVER = config('MAIL_SERVER')
+    MAIL_PORT = config('MAIL_PORT')
+    MAIL_USE_SSL = config('MAIL_USE_SSL')
+    MAIL_USERNAME = config('MAIL_USERNAME')
+    MAIL_PASSWORD = config('MAIL_PASSWORD')
     # Fluid layout True or False
     FLASK_ADMIN_FLUID_LAYOUT = True
     # Set the theme name

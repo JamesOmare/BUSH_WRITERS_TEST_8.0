@@ -2,6 +2,8 @@ from flask_admin.contrib.sqla import ModelView
 from src import db, admin
 from src.models.users import User
 from src.models.accounts import Account
+from src.models.confirmation import Confirmation
+from src.models.account_credentials import Account_Credentials
 from wtforms.fields import SelectField, PasswordField, StringField
 from flask_admin import Admin, BaseView, expose, Admin, AdminIndexView
 from flask_admin.contrib.fileadmin import FileAdmin
@@ -9,7 +11,7 @@ import os.path as op
 from flask import g, url_for, flash, request, render_template
 from flask_admin.actions import action
 from sqlalchemy.sql import func
-from ..auth.form_fields import AdminForm
+from ..auth.form_fields import AdminForm, Payment_Status
 from ..models.messages import Message
 from ..models.complaints import Complaints
 
@@ -30,6 +32,27 @@ from ..models.complaints import Complaints
 class OnProgressView(ModelView):
     can_delete = False
     can_create = False
+
+    list_template = 'admin/add2.html'
+    edit_template = 'admin/edit.html'
+
+    #  Override to allow POSTS
+    @expose('/', methods=('GET', 'POST'))
+    def index_view(self):
+        return super(OnProgressView, self).index_view()
+    
+    def render(self, template, **kwargs):
+        # we are only interested in our custom list page
+        if template == 'admin/add2.html':
+            
+            def get_counting_query(self):
+                return self.session.query(func.count('*')).filter(self.model.status==1).scalar()
+            
+            kwargs['number'] = get_counting_query(self)
+                        
+
+
+        return super(OnProgressView, self).render(template, **kwargs)
     
     _status_choices = [(choice, label) for choice, label in [
         (Account.STATUS_AVAILABLE, 'Available'),
@@ -63,6 +86,8 @@ class OnProgressView(ModelView):
 
     def get_query(self):
       return self.session.query(self.model).filter(self.model.status==1)
+
+    
 
     
 class VerificationView(ModelView):
@@ -258,16 +283,16 @@ class FormView(BaseView):
             if form.validate_on_submit() == False:
                 flash('All fields are required.', 'error')
                 return self.render('admin/form.html', form=form)
-
             else:
                 login_email = form.ac_login_email.data
                 login_pass = form.ac_login_pass.data
-                user_id = form.user_id.data
+                buyer_id = form.buyer_id.data
                 account_id = form.account_id.data
                 new_msg = Message(
                     login_password = login_pass,
                     login_email = login_email,
-                    user_id = user_id,
+                    type = 2,
+                    buyer_id = buyer_id,
                     account_id = account_id
                 )
 
@@ -276,6 +301,64 @@ class FormView(BaseView):
                 flash('Message sent succcessfully to recipient', 'success')
                 return self.render('admin/form.html', form = form)
         return self.render('admin/form.html', form = form)
+
+            # elif form.type == 0:
+            #     buyer_id = form.user_id.data
+            #     account_id = form.account_id.data
+            #     alert_message = form.intent_message.data
+            #     purchase_intent_msg = Message(
+            #         buyer_id = buyer_id,
+            #         account_id = account_id,
+            #         intent_message = alert_message
+            #     )
+            #     db.session.add(purchase_intent_msg)
+            #     db.session.commit()
+            #     flash('Message sent succcessfully to recipient', 'success')
+            #     return self.render('admin/form.html', form = form)
+
+            # elif form.type == 1:
+            #     buyer_id = form.user_id.data
+            #     account_id = form.account_id.data
+            #     alert_message = form.purchase_verification_message.data
+            #     purchase_verification_msg = Message(
+            #         buyer_id = buyer_id,
+            #         account_id = account_id,
+            #         purchase_verification_message = alert_message
+            #     )
+            #     db.session.add(purchase_verification_msg)
+            #     db.session.commit()
+            #     flash('Message sent succcessfully to recipient', 'success')
+            #     return self.render('admin/form.html', form = form)
+
+            # elif form.type == 2:
+            #     buyer_id = form.user_id.data
+            #     account_id = form.account_id.data
+            #     alert_message = form.successful_purchase.data
+            #     successful_purchase_msg = Message(
+            #         buyer_id = buyer_id,
+            #         account_id = account_id,
+            #         successful_purchase = alert_message
+            #     )
+            #     db.session.add(successful_purchase_msg)
+            #     db.session.commit()
+            #     flash('Message sent succcessfully to recipient', 'success')
+            #     return self.render('admin/form.html', form = form)
+
+            # elif form.type == 3:
+            #     buyer_id = form.user_id.data
+            #     account_id = form.account_id.data
+            #     alert_message = form.failed_purchase.data
+            #     failed_purchase_msg = Message(
+            #         buyer_id = buyer_id,
+            #         account_id = account_id,
+            #         failed_purchase = alert_message
+            #     )
+            #     db.session.add(failed_purchase_msg)
+            #     db.session.commit()
+            #     flash('Message sent succcessfully to recipient', 'success')
+            #     return self.render('admin/form.html', form = form)
+
+            
 
 
 class AccountModelView(ModelView):
@@ -320,6 +403,70 @@ def on_model_change(self, form, model, is_created):
         return super(UserModelView, self).on_model_change(form, model, is_created)
 
 
+class Confirmation_Message(BaseView):
+    @expose('/', methods=('GET', 'POST'))
+    # @login_required
+    # @has_role('admin')
+    def notification_page(self):
+        confirmation = Confirmation.query.all()
+        form = Payment_Status()
+        if request.method == 'POST':
+            if not confirmation:
+                confirmation = None
+            if form.validate_on_submit() == False:
+                flash('All fields are required.', 'error')
+                return self.render('admin/on_progress.html', form=form, confirmations = confirmation)
+            else:
+                confirmed = form.success.data
+                rejected = form.failure.data
+                account_id = form.account_id.data
+                buyer_id = form.buyer_id.data
+                seller_id = form.seller_id.data
+                account = Account.query.filter_by(account_id = account_id).first()
+                if confirmed:
+                    print('Account status was: ', account.status, 'Account id: ', account_id)
+                    account.status = 2
+                    # db.session.refresh(account)
+                    db.session.merge(account)
+                    db.session.commit()
+                    # print('Account session: ' , Account.query.session.connection().engine)
+                    # print('db session: ', db.session.connection().engine)
+                    # print(' ', Account.query.session == db.session)
+                    # print(' ', Account.query.session.connection() == db.session.connection())
+                    print('Account status now is: ',account.status)
+                    # print(Account.query.session.connection().engine.url)
+                    # print(db.session.connection().engine.url)
+                    alert_message = True
+                    alert_type = 0
+                    alert = Message(
+                        buyer_id = buyer_id,
+                        seller_id = seller_id,
+                        account_id = account_id,
+                        purchase_verification_message = alert_message,
+                        type = alert_type
+                    )
+
+                    db.session.add(alert)
+                    db.session.commit()
+                    flash('Status has been updated successfully', 'success')
+                    return self.render('admin/on_progress.html', form = form, confirmations = confirmation)
+                elif rejected:
+                    print('Account Status is', account.status)
+                    flash('The buyer will be notified of the purchase status', 'danger')
+                    return self.render('admin/on_progress.html', form = form, confirmations = confirmation)
+        return self.render('admin/on_progress.html', confirmations = confirmation, form = form)
+
+class Rejected_Accounts(BaseView):
+    @expose('/')
+    # @login_required
+    # @has_role('admin')
+    def second_page(self):
+        complaints = Complaints.query.all()
+        if not complaints:
+            complaints = None
+        return self.render('admin/complaint_claims.html', claims = complaints)
+
+
 class NotificationsView(BaseView):
     @expose('/')
     def index(self):
@@ -336,3 +483,5 @@ admin.add_view(OnProgressView(Account, db.session, name='On Progress', endpoint=
 admin.add_view(VerificationView(Account, db.session, name='Verification Pending', endpoint="pending_verification"))
 admin.add_view(SucessView(Account, db.session, name='Successful', endpoint="success"))
 admin.add_view(DisputedView(Account, db.session, name='Disputed', endpoint="disputed"))
+admin.add_view(Confirmation_Message(name = 'Confirmation Messeges', category="Incoming Messages"))
+admin.add_view(Rejected_Accounts(name = 'Rejection Messeges', category="Incoming Messages"))

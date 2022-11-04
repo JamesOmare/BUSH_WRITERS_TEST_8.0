@@ -1,9 +1,9 @@
-from flask import Flask, session, abort
+from flask import Flask, session, abort, render_template
 from os import path
 from .config.config import Config
 from .auth.views import auth
 from .main.views import main
-from.utils import db, migrate, login_manager, admin, moment
+from.utils import db, migrate, login_manager, admin, moment, mail
 from .models.users import User
 from .models.accounts import Account
 
@@ -38,6 +38,8 @@ def create_app(config = Config):
     migrate.init_app(app, db, render_as_batch=True)
     login_manager.init_app(app)
     moment.init_app(app)
+    mail.init_app(app)
+
     
 
     # Flask and Flask-SQLAlchemy initialization here
@@ -68,6 +70,11 @@ def create_app(config = Config):
     @login_manager.user_loader
     def load_user(id):
        return User.query.get(int(id))
+
+    # Invalid URL error 
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template('404.html'), 404
 
     return app
 

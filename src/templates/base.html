@@ -15,7 +15,7 @@
 </head>
 <body>
     <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <nav class="navbar navbar-expand-md navbar-dark navbar-color fixed-top">
           <div class="container">
             <a class="navbar-brand mr-4" href="/">Bush Writers</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,17 +90,23 @@
           
         </div>
       </main>
-  
+
+      
+      {% block footer %}
+        
+      {% endblock footer %}
+        
+
+      
+      {% block scripts %}{% endblock scripts %}
       <script>
         $(document).ready(function(){
           $(".alert").hide(4000);
         });
       </script>
       
-      {% block scripts %}{% endblock scripts %}
-        
-    
-    
+      
+
       
 </body>
 </html>

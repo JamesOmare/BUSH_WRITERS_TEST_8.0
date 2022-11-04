@@ -8,7 +8,10 @@ from ..models.users import User
 from ..models.messages import Message
 from ..models.complaints import Complaints
 from ..models.images import Image
-from ..auth.form_fields import Seller_Profile_Form, Account_Images, Update_User_Account, Payment_Dropdown, Complaint
+from ..models.confirmation import Confirmation
+from ..models.account_credentials import Account_Credentials
+from ..auth.form_fields import (Seller_Profile_Form, Account_Images, Update_User_Account, Payment_Method, 
+                                Complaint, Confirmation_Form, Seller_Account_Details, Search, FilteredSearch)
 from ..utils import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import and_, desc,asc
@@ -19,20 +22,87 @@ from werkzeug.utils import secure_filename
 main = Blueprint('main', __name__)
 
 
-@main.route('/view')
-def homepage():
-    return render_template('view.html')
+# @main.route('/view')
+# def homepage():
+#     page = request.args.get('page', 1, type=int)
+#     account = Account.query.filter_by(status = 0).paginate(page=page, per_page=2)
+#     search_form = Search()
+   
+#     return render_template('view3.html', account=account, logged_in_user=current_user, form = search_form)
+
+@main.route('/search', methods = ['POST', 'GET'])
+def search_results():
+    form = Search()
+    filter_form = FilteredSearch()
+    purchase_form = Payment_Method()
+    page = request.args.get('page', 1, type=int)
+    accounts = Account.query.filter_by(status = 0)
+    if form.validate_on_submit():
+        # get data from submitted form
+        keyword = form.keyword.data
+
+        # query the database
+        accounts = accounts.filter(Account.description.like('%' + keyword + '%'))
+        accounts = accounts.order_by(Account.account_type).paginate(page=page, per_page=2)
+        return render_template('search.html', form = form, logged_in_user=current_user, keyword = keyword, account = accounts, purchase_form = purchase_form)
+
+    # if filter_form.validate_on_submit():
+    #     article_ac = filter_form.article_ac.data
+    #     academic_ac = filter_form.academic_ac.data
+    #     blogging_ac = filter_form.blogging_ac.data
+    #     date_from = filter_form.date_from.data
+    #     date_to = filter_form.date_to.data
+    #     price_range_a = filter_form.price_range_a.data
+    #     price_range_b = filter_form.price_range_b.data
+
+    #     # if article_ac and academic_ac and blogging_ac and date_from and date_to and price_range_a and price_range_b:
+
+    #     # elif not article_ac and academic_ac and blogging_ac and date_from and date_to and price_range_a and price_range_b:
+
+    #     # elif not article_ac and not academic_ac and not blogging_ac and date_from and date_to and price_range_a and price_range_b:
+
+    #     # elif not article_ac and not academic_ac and not blogging_ac and not date_from and date_to and price_range_a and price_range_b:
+
+    #     if article_ac and academic_ac and blogging_ac:
+    #         if date_from or date_to:
+    #             if price_range_a or price_range_b:
+            
+    #         elif price_range_a or price_range_b:
+
+    #         else:
+    #             accounts = accounts.all()
+    #             return render_template('search.html', form = form, filter_form = filter_form, logged_in_user=current_user, accounts = accounts)
+    #     elif not article_ac and academic_ac and blogging_ac:
+    #         if date_from or date_to:
+    #             if price_range_a or price_range_b:
+
+    #     elif not article_ac and not academic_ac and blogging_ac:
+    #         if date_from or date_to:
+    #             if price_range_a or price_range_b:
+        
+    #     elif not article_ac and not academic_ac and not blogging_ac:
+    #         if date_from or date_to:
+    #             if price_range_a or price_range_b:
+
+            
+
+    return render_template('search.html', form = form, logged_in_user=current_user, account = accounts, purchase_form = purchase_form)
+
 
 
 @main.route('/', methods = ['GET', 'POST'])
 def viewpage():
-    form = Payment_Dropdown()
-    account = Account.query.filter_by(status = 0)
+    page = request.args.get('page', 1, type=int)
+    account = Account.query.filter_by(status = 0).paginate(page=page, per_page=2)
+    search_form = Search()
+    purchase_form = Payment_Method()
    
-    if request.method == 'POST' and form.validate_on_submit():
-        account_id = form.info.data
+    if request.method == 'POST' and purchase_form.validate_on_submit():
+        account_id = purchase_form.info.data
+        payment_method = purchase_form.payment_method.data
+        print(payment_method)
         return redirect(url_for('main.payment', product_id = account_id))
-    return render_template('view2.html', account=account, logged_in_user=current_user, form = form)
+    return render_template('view3.html', account=account, logged_in_user=current_user, purchase_form = purchase_form, form = search_form)
 
 @main.route('/product_view/<item_id>')
 def product_view(item_id):
@@ -176,20 +246,25 @@ def update_profile():
 
 @main.route('/chat_page/<id>', methods = ['GET', 'POST'])
 def chat(id):
-    msg = Message.query.filter_by(user_id = id).all()
-    form = Complaint()
-    if msg:
-        if request.method == 'POST' and form.validate_on_submit():
-            user_number = form.buyer_phone_number.data
-            seller_number = form.seller_phone_number.data
-            reason = form.reason.data
-            extended_reason = form.extended_reason.data
+    buyer_msg = Message.query.filter_by(buyer_id = id).all()
+    seller_msg = Message.query.filter_by(seller_id = id).all()
+    account_credentials = Account_Credentials.query.filter_by(buyer_id = id).all()
+    buyer_form = Complaint()
+    seller_form = Seller_Account_Details()
+    if buyer_msg and seller_msg:
+        if request.method == 'POST' and buyer_form.validate_on_submit():
+            seller_id = buyer_form.seller_id.data
+            user_number = buyer_form.buyer_phone_number.data
+            seller_number = buyer_form.seller_phone_number.data
+            reason = buyer_form.reason.data
+            extended_reason = buyer_form.extended_reason.data
 
             if not extended_reason:
                 extended_reason = None
 
             complaint_entry = Complaints(
-                user_id = current_user.id,
+                buyer_id = current_user.id,
+                seller_id = seller_id,
                 buyer_number = user_number,
                 seller_number = seller_number,
                 reason = reason,
@@ -200,12 +275,107 @@ def chat(id):
             db.session.commit()
             flash('Successfully sent complaint to admin, purchase status updated!', 'success')
 
-            return render_template('chat.html', msg = msg, form = form)
-        else:
-            return render_template('chat.html', msg = msg, form = form)
+            return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form)
 
-    else:
+        elif request.method == 'POST' and seller_form.validate_on_submit():
+            buyer_id = seller_form.buyer_id.data
+            account_id = seller_form.account_id.data
+            account_name = seller_form.account_name.data
+            account_type = seller_form.account_type.data
+            account_email = seller_form.account_email.data
+            account_url = seller_form.account_url.data
+            account_passphrase = seller_form.account_passphrase.data
+
+            credentials_entry = Account_Credentials(
+                seller_id = current_user.id,
+                buyer_id = buyer_id,
+                account_name = account_name,
+                account_type = account_type,
+                account_email = account_email,
+                account_url = account_url,
+                account_passphrase = account_passphrase
+
+            )
+
+            db.session.add(credentials_entry)
+            db.session.commit()
+            flash('Successfully sent account credential details to admin, Please wait for account verification!', 'success')
+            return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form)
+        else:
+            if seller_msg:
+                return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form)
+            return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form)
+    
+    elif buyer_msg and not seller_msg:
+        if account_credentials:
+            if request.method == 'POST' and buyer_form.validate_on_submit():
+                user_number = buyer_form.buyer_phone_number.data
+                seller_number = buyer_form.seller_phone_number.data
+                reason = buyer_form.reason.data
+                extended_reason = buyer_form.extended_reason.data
+
+                if not extended_reason:
+                    extended_reason = None
+
+                complaint_entry = Complaints(
+                    buyer_id = current_user.id,
+                    buyer_number = user_number,
+                    seller_number = seller_number,
+                    reason = reason,
+                    further_description = extended_reason
+                )
+
+                db.session.add(complaint_entry)
+                db.session.commit()
+                flash('Successfully sent complaint to admin, purchase status updated!', 'success')
+
+                return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form, accounts = account_credentials)
+            return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form, accounts = account_credentials)
+        else:
+            return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form)
+    
+
+    elif seller_msg and not buyer_msg:
+        if request.method == 'POST' and seller_form.validate_on_submit():
+            buyer_id = seller_form.buyer_id.data
+            account_id = seller_form.account_id.data
+            account_name = seller_form.account_name.data
+            account_type = seller_form.account_type.data
+            account_email = seller_form.account_email.data
+            account_url = seller_form.account_url.data
+            account_passphrase = seller_form.account_passphrase.data
+
+            credentials_entry = Account_Credentials(
+                seller_id = current_user.id,
+                buyer_id = buyer_id,
+                account_id = account_id,
+                account_name = account_name,
+                account_type = account_type,
+                account_email = account_email,
+                account_url = account_url,
+                account_passphrase = account_passphrase
+
+            )
+
+            db.session.add(credentials_entry)
+            db.session.commit()
+
+            alert = Message.query.filter_by(account_id = account_id).first()
+            print('Previous_Account_Type:', alert.type)
+            updated_type = 2
+            alert.type = updated_type
+            db.session.commit()
+            print('Current_Account_Type:', alert.type)
+            flash('Successfully sent account credential details to admin, Please wait for account verification!', 'success')
+            return render_template('chat.html', seller_msg = seller_msg, seller_form = seller_form)
+        return render_template('chat.html', seller_msg = seller_msg, seller_form = seller_form)
+
+
+    elif not buyer_msg and not seller_msg:
         return render_template('chat.html')
+
+    # else:
+    #     return render_template('chat.html')
     
 @main.route('/payment/<product_id>', methods = ['GET', 'POST'])
 def payment(product_id):
@@ -214,5 +384,34 @@ def payment(product_id):
     return render_template('payment.html', account = account)
 
 
-# '@main.route('/on_progress/<product_id>')
-# def on_progress():
+@main.route('/on_progress/<product_id>', methods = ['POST', 'GET'])
+def on_progress(product_id):
+    account = Account.query.filter_by(account_id = product_id).first()
+    confirmation_form = Confirmation_Form()
+
+    if request.method == 'POST' and confirmation_form.validate_on_submit():
+        msg = confirmation_form.confirmation_msg.data
+
+        message = Confirmation(
+            buyer_id = current_user.id,
+            confirmation_msg = msg,
+            buyer_email = current_user.email,
+            seller_id = account.user_id,
+            account_id = account.account_id
+        )
+
+        db.session.add(message)
+        db.session.commit()
+
+        flash('Confirmation message send to admin sucessfully, please wait.', 'success')
+        return render_template('confirmation_message.html', form = confirmation_form)
+    return render_template('confirmation_message.html', form = confirmation_form)
+
+# @main.route('/verification_stage/<product_id>', methods = ['POST', 'GET'])
+# def verification_stage(product_id):
+#     if request.method == 'POST':
+
+
+
+
+

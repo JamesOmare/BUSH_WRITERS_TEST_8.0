@@ -1,0 +1,87 @@
+{% extends 'admin/master.html' %}
+
+
+{% block head_css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="mr-auto">Bootstrap</strong>
+      <small>11 mins ago</small>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body">
+      Hello, world! This is a toast message.
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <h3 class="card-header">Card header</h3>
+    <div class="card-body">
+      <h5 class="card-title">Special title treatment</h5>
+      <h6 class="card-subtitle text-muted">Support card subtitle</h6>
+    </div>
+    
+    <div class="card-body">
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    </div>
+  
+    <div class="card-body">
+      <a href="#" class="card-link">Card link</a>
+      <a href="#" class="card-link">Another link</a>
+    </div>
+    <div class="card-footer text-muted">
+      2 days ago
+    </div>
+  </div>
+
+  {% if confirmations %}
+
+      {% for confirmation in confirmations %}
+      <form action="" method="POST">
+        {{ form.csrf_token }}
+        {{ form.hidden_tag(form.account_id(), form.buyer_id(), form.seller_id()) }}
+        <div class="card text-white bg-primary mb-3 claim">
+          <div class="card-header">Confirmation {{ loop.index }}</div>
+          <div class="card-body">
+            <h4 class="card-title">Primary card title</h4>
+            <p class="card-text">{{ confirmation.confirmation_msg }}.</p>
+            <p class="card-text">Buyer Email: {{ confirmation.buyer_email }}.</p>
+              <div class="form-group">
+                {{ form.account_id(value='{}'.format(confirmation.account_id)) }}
+                {{ form.buyer_id(value='{}'.format(confirmation.buyer_id)) }}
+                {{ form.seller_id(value='{}'.format(confirmation.seller_id)) }}
+                {{ form.success(class="btn btn-success") }}
+                {{ form.failure(class="btn btn-danger ml-3") }}
+              </div>
+            
+          </div>      
+        </div>
+      </form>
+        
+
+      {% endfor %}
+
+  {% else %}
+  <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <h4 class="card-title">Primary card title</h4>
+      <p class="card-text">There are no complaints.</p>
+    </div>
+  </div>
+  {% endif %}
+  
+  <!-- <script>
+    function handleForm() {
+    preventDefault();
+    console.log('here')
+  }
+  </script> -->
+  
+{% endblock body %}

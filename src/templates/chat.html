@@ -7,7 +7,6 @@
     
 {% block content %}
 
-
         <main>
         <div class="container py-4">
           <header class="pb-3 mb-4 border-bottom">
@@ -15,118 +14,428 @@
               <span class="fs-4">Notifications Page</span>
             </a>
           </header>
-    {% if msg %}
+    {% if buyer_msg %}
 
-    {% for item in msg %}
-          <div class="fm-content">
-            <form>
-              <fieldset disabled>
+      {% for item in buyer_msg %}
+            {% if item.type == 0 %}
+              <div class="fm-content">
+                <form>
+                  <fieldset disabled>
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title text-white">Purchase Intent Alert</h5>
+                          <p class="card-text text-white">
+                            We have received the confirmation message sent and have verified it. Please wait while we contact the seller
+                            so as to send you the account credentials for you to acertain validity of the account.
+                          </p>                
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                  <p class="text">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                      
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      
+                      <input class="btn btn-primary" type="submit" value="Close">
+                      <br/>                  
+                  </div> 
+                </form>
+              </div>
+              <br>
+            {% endif %}
+
+            {% if item.type == 1 %}
+              <div class="fm-content">
+                <form>
+                  <fieldset disabled>
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title">Verification Message Failed Alert</h5>
+                          <p class="card-text">
+                            The confirmation message sent to us failed to be authenticated within the given time. please contact our suppport 
+                            centre for assistance or try again.
+                          </p>
+                          <a href="#" class="btn btn-primary">Close</a>                      
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                  <p class="text">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                      
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      
+                      <input class="btn btn-primary" type="submit" value="Close">
+                      <br/>                  
+                  </div> 
+                </form>
+              </div>
+              <br>
+            {% endif %}
+
+            {% if item.type == 2 %}
+              {% if accounts %}
+                {% for account in accounts %}
+
+                <div class="accordion fm-content" id="accordionExample">    
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                      <div class="accordion-body ">
+                        <fieldset disabled>
+                          <div class="mb-3 title-time-display">
+                              <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                              <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                          </div>
+
+                          <div>
+                            <p class="mb-3 text-white">
+                              This is the credentials for account {{ account.account_name }}. Check the account credentials, 
+                              status to validate authenticity of the account before clicking the confirmation button.
+                              <br>
+                              <i class="bi bi-exclamation-triangle warning-red">
+                                Do not change account credentials in this step.
+                              </i>
+                            </p>
+                          </div>
+  
+                          <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label text-white">Account Name</label>
+                            <input type="text" id="account-val" value="{{account.account_name}}" class="form-control" placeholder="Disabled input">
+                          </div>
+  
+                          <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label text-white">Account Type</label>
+                            <input type="text" id="account-val" value="{{account.account_type}} account" class="form-control" placeholder="Disabled input">
+                          </div>
+  
+                          <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label text-white">Account Email</label>
+                            <input type="text" id="account-val" value="{{account.account_email}}" class="form-control" placeholder="Disabled input">
+                          </div>
+  
+                          <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label text-white">Account Url</label>
+                            <input type="text" id="account-val" value="{{account.account_url}}" class="form-control" placeholder="Disabled input">
+                          </div>
+  
+                          <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label text-white">Account Passphrase</label>
+                            <input type="text" id="account-val" value="{{account.account_passphrase}}" class="form-control" placeholder="Disabled input">
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+
+                    <br/>
+                    <div class="mb-3 text-white">
+                    <p class="text">
+                        <i class="bi bi-exclamation-triangle warning-red">
+                          You have 24 hours from {{ moment(item.time_posted).format('LLL') }} to raise a complaint upon which a refund can be offered !
+                        </i>
+                        
+                        
+                        <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                        <input class="btn btn-primary" type="submit" value="Confirm Credentials">
+                        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                          Close/Open
+                        </button>
+                       
+                        <br/> 
+                    </div> 
+
+                    
+                 
+
+
+                  <div class="accordion fm-content">
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                      <div class="accordion-body">
+                        <form action="" method="POST">
+                          {{ form.csrf_token }}
+                          {{ form.hidden_tag(form.seller_id()) }}
+                              <!-- Buyer phone number -->
+                              <div class="form-group">
+                                {{ form.buyer_phone_number.label(class="form-control-label text-white") }}
+                                {% if form.buyer_phone_number.errors %}
+                                    {{ form.buyer_phone_number(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.buyer_phone_number.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.buyer_phone_number(class="form-control form-control-lg") }}
+                                {% endif %}
+                              </div>
+    
+                              <!-- Seller phone number -->
+                              <div class="form-group">
+                                {{ form.seller_phone_number.label(class="form-control-label text-white") }}
+                                {% if form.seller_phone_number.errors %}
+                                    {{ form.seller_phone_number(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.seller_phone_number.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.seller_phone_number(class="form-control form-control-lg") }}
+                                {% endif %}
+                              </div>
+    
+                              <!-- Reason -->
+                              <div class="form-group">
+                                {{ form.reason.label(class="form-control-label text-white") }}
+                                {% if form.reason.errors %}
+                                    {{ form.reason(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.reason.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.reason(class="form-control form-control-lg") }}
+                                {% endif %}
+                              </div>
+    
+                            <!-- Extended Description -->
+                            <div class="form-group">
+                              {{ form.extended_reason.label(class="form-control-label text-white") }}
+                              {% if form.extended_reason.errors %}
+                                  {{ form.extended_reason(class="form-control form-control-lg is-invalid") }}
+                                  <div class="invalid-feedback">
+                                      {% for error in form.extended_reason.errors %}
+                                          <span>{{ error }}</span>
+                                      {% endfor %}
+                                  </div>
+                              {% else %}
+                                  {{ form.extended_reason(class="form-control form-control-lg") }}
+                              {% endif %}
+                            </div>
+    
+                            {{ form.seller_id(value='{}'.format(item.seller_id)) }}
+                            <div class="form-group">
+                              {{ form.submit(class="btn btn-danger mt-3") }}
+                            </div>
+    
+                        </form>
+                      </div>
+                    </div>
+                    <h2 class="accordion-header" id="headingTwo">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Rejection Form
+                      </button>
+                    </h2>
+                  </div>
+                </div>
+
+                {% endfor %}                
+              {% endif %}
+            {% endif %}
+
+            {% if item.type == 3 %}
+                <form>
+                  <fieldset disabled>
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title">Succeesful Purchase Alert</h5>
+                          <p class="card-text">
+                            We have received the confirmation message sent and have verified it. Please wait while we contact the seller
+                            so as to send you the account credentials so as to acertain validity of the account.
+                          </p>
+                          <a href="#" class="btn btn-primary">Close</a>                      
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                  <p class="text">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                      
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      
+                      <input class="btn btn-primary" type="submit" value="Close">
+                      <br/>                  
+                  </div> 
+                </form>
+            {% endif %}
+
+            {% if item.type == 4 %}
+                <form>
+                  <fieldset disabled>
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title">Failed Purchase Alert</h5>
+                          <p class="card-text">
+                            We have received the confirmation message sent and have verified it. Please wait while we contact the seller
+                            so as to send you the account credentials so as to acertain validity of the account.
+                          </p>
+                          <a href="#" class="btn btn-primary">Close</a>                      
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                  <p class="text">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                      
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      
+                      <input class="btn btn-primary" type="submit" value="Close">
+                      <br/>                  
+                  </div> 
+                </form>
+            {% endif %}
+          
+          <br>
+    {% endfor %}
+    {% endif %}
+
+    {% if seller_msg %}
+      {% for item in seller_msg %}
+              <div class="fm-content">
                   <div class="mb-3 title-time-display">
                       <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
                       <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
-                    </div>
-                <div class="mb-3">
-                  <label for="disabledTextInput" class="form-label text-white">Account Email</label>
-                  <input type="text" id="account-val" value="{{item.login_email}}" class="form-control" placeholder="Disabled input">
-                </div>
-                <div class="mb-3">
-                  <label for="disabledTextInput" class="form-label text-white">Account Password</label>
-                  <input type="text" id="account-val" value="{{item.login_password}}" class="form-control" placeholder="Disabled input">
-                </div>
-              </fieldset>
-              <br/>
-              <div class="mb-3 text-white">
-              <p class="text">
-                  <i class="bi bi-exclamation-triangle"></i>
-                  You have 24 hours from to raise a complaint upon which a refund can be afforded !
-                  
-                  <p>{{ moment(item.time_posted).format('LLL') }}.</p>
-                  
-                  <input class="btn btn-primary" type="submit" value="Confirm">
-                  <br/>
-                  <span class="moreText"> assumenda sapiente expedita labore atque! Sint.</span></p>
-                  
-              </div> 
-            </form>
-
-            <form action="" method="POST">
-              {{ form.csrf_token }}
-              {{ form.hidden_tag() }}
-                  <!-- Buyer phone number -->
-                  <div class="form-group">
-                    {{ form.buyer_phone_number.label(class="form-control-label text-white") }}
-                    {% if form.buyer_phone_number.errors %}
-                        {{ form.buyer_phone_number(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.buyer_phone_number.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.buyer_phone_number(class="form-control form-control-lg") }}
-                    {% endif %}
                   </div>
-
-                  <!-- Seller phone number -->
-                  <div class="form-group">
-                    {{ form.seller_phone_number.label(class="form-control-label text-white") }}
-                    {% if form.seller_phone_number.errors %}
-                        {{ form.userseller_phone_number_id(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.seller_phone_number.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.seller_phone_number(class="form-control form-control-lg") }}
-                    {% endif %}
-                  </div>
-
-                  <!-- Reason -->
-                  <div class="form-group">
-                    {{ form.reason.label(class="form-control-label text-white") }}
-                    {% if form.reason.errors %}
-                        {{ form.reason(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.reason.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.reason(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-
-                <!-- Extended Description -->
-                <div class="form-group">
-                  {{ form.extended_reason.label(class="form-control-label text-white") }}
-                  {% if form.extended_reason.errors %}
-                      {{ form.extended_reason(class="form-control form-control-lg is-invalid") }}
-                      <div class="invalid-feedback">
-                          {% for error in form.extended_reason.errors %}
-                              <span>{{ error }}</span>
-                          {% endfor %}
+                  <div class="mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title text-white">Buyer Intent Alert</h5>
+                        <p class="card-text text-white">
+                          We have received payment from a buyer for your account. Please provide account details to the admin for account verification.
+                        </p>                
                       </div>
-                  {% else %}
-                      {{ form.extended_reason(class="form-control form-control-lg") }}
-                  {% endif %}
-                </div>
+                  </div>
+                  
+                  <br/>
 
-                <div class="form-group">
-                  {{ form.submit(class="btn btn-danger mt-3") }}
-                </div>
+                  <form action="" method="POST">
+                    {{ seller_form.csrf_token }}
+                    {{ seller_form.hidden_tag(seller_form.buyer_id(), seller_form.account_id()) }}
+                        <!-- Seller's account Name -->
+                        <div class="form-group">
+                          {{ seller_form.account_name.label(class="form-control-label text-white") }}
+                          {% if seller_form.account_name.errors %}
+                              {{ seller_form.account_name(class="form-control form-control-lg is-invalid") }}
+                              <div class="invalid-feedback">
+                                  {% for error in seller_form.account_name.errors %}
+                                      <span>{{ error }}</span>
+                                  {% endfor %}
+                              </div>
+                          {% else %}
+                              {{ seller_form.account_name(class="form-control form-control-lg") }}
+                          {% endif %}
+                        </div>
 
-            </form>
-          </div>
-       
-      <br>
-    {% endfor %}
-        
-  {% else %}
+                        <!-- Seller's account Type -->
+                        <div class="form-group">
+                          {{ seller_form.account_type.label(class="form-control-label text-white") }}
+                          {% if seller_form.account_type.errors %}
+                              {{ seller_form.account_type(class="form-control form-control-lg is-invalid") }}
+                              <div class="invalid-feedback">
+                                  {% for error in seller_form.account_type.errors %}
+                                      <span>{{ error }}</span>
+                                  {% endfor %}
+                              </div>
+                          {% else %}
+                              {{ seller_form.account_type(class="form-control form-control-lg") }}
+                          {% endif %}
+                        </div>
+
+                        <!-- Seller's account Email -->
+                        <div class="form-group">
+                          {{ seller_form.account_email.label(class="form-control-label text-white") }}
+                          {% if seller_form.account_email.errors %}
+                              {{ seller_form.account_email(class="form-control form-control-lg is-invalid") }}
+                              <div class="invalid-feedback">
+                                  {% for error in seller_form.account_email.errors %}
+                                      <span>{{ error }}</span>
+                                  {% endfor %}
+                              </div>
+                          {% else %}
+                              {{ seller_form.account_email(class="form-control form-control-lg") }}
+                          {% endif %}
+                        </div>
+
+                        <!-- Seller's account Url -->
+                        <div class="form-group">
+                          {{ seller_form.account_url.label(class="form-control-label text-white") }}
+                          {% if seller_form.account_url.errors %}
+                              {{ seller_form.account_url(class="form-control form-control-lg is-invalid") }}
+                              <div class="invalid-feedback">
+                                  {% for error in seller_form.account_url.errors %}
+                                      <span>{{ error }}</span>
+                                  {% endfor %}
+                              </div>
+                          {% else %}
+                              {{ seller_form.account_url(class="form-control form-control-lg") }}
+                          {% endif %}
+                        </div>
+
+                        <!-- Seller's account Passphrase -->
+                        <div class="form-group">
+                          {{ seller_form.account_passphrase.label(class="form-control-label text-white") }}
+                          {% if seller_form.account_passphrase.errors %}
+                              {{ seller_form.account_passphrase(class="form-control form-control-lg is-invalid") }}
+                              <div class="invalid-feedback">
+                                  {% for error in seller_form.account_passphrase.errors %}
+                                      <span>{{ error }}</span>
+                                  {% endfor %}
+                              </div>
+                          {% else %}
+                              {{ seller_form.account_passphrase(class="form-control form-control-lg") }}
+                          {% endif %}
+                        </div>
+
+                        {{ seller_form.buyer_id(value='{}'.format(item.buyer_id)) }}
+                        {{ seller_form.account_id(value='{}'.format(item.account_id)) }}
+                        <div class="form-group">
+                          {{ seller_form.submit(class="btn btn-danger mt-3") }}
+                        </div>
+
+                  </form>
+                  
+                  <div class="mb-3 text-white">
+                  <p class="text">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                      
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      
+                      <input class="btn btn-primary" type="submit" value="Close">
+                      <br/>                  
+                  </div> 
+              </div>
+              <br>
+      {% endfor %}      
+    {% endif %}
+    
+
+    {% if not buyer_msg and not seller_msg %}
     <p>You have no notifications.</p>
     <input type="button" class="btn btn-dark" value="Go back!" onclick="history.back()">
+    {% endif %}
       
-  {% endif %}
+
+  
 </div>
 </main>
 
@@ -177,22 +486,74 @@
 
 {% endblock sidebar %}
 
+{% block footer %}
+<div class="border-top pt-3"></div>
+<div class="container footer-container">
+  <footer class="py-5">
+    <div class="row">
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-5 offset-md-1 mb-3">
+        <form>
+          <h5 class="text-white">Subscribe to our newsletter</h5>
+          <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
+          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+            <label for="newsletter1" class="visually-hidden">Email address</label>
+            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
+            <button class="btn btn-primary" type="button">Subscribe</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
+      <p class="text-white">&copy; 2022 Company, Inc. All rights reserved.</p>
+      <ul class="list-unstyled d-flex">
+        <i class="bi bi-twitter p-2 text-white"></i>
+        <i class="bi bi-instagram p-2 text-white"></i>
+        <i class="bi bi-facebook p-2 text-white"></i>
+        <li class="ms-3"><a class="text-white" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"/></svg></a></li>
+        <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"/></svg></a></li>
+        <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"/></svg></a></li>
+      </ul>
+    </div>
+  </footer>
+</div>
+{% endblock footer %}
 
 {% block scripts %}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-  <script>
-    const readMoreBtn = document.querySelector(".btn-danger");
-    const text = document.querySelector(".text");
-  
-    readMoreBtn.addEventListener("click", (e) => {
-      text.classList.toggle("show-more");
-      if (readMoreBtn.innerText === "Read More") {
-        readMoreBtn.innerText = "Read Less";
-      } else {
-        readMoreBtn.innerText = "Read More";
-      }
-    });
-  </script>
   
 {% endblock scripts %}
   

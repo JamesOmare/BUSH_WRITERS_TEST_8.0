@@ -11,6 +11,7 @@ class Complaints(UserMixin ,db.Model):
     __tablename__ = 'complaint'
     id = db.Column(db.Integer, primary_key = True)
     buyer_id = db.Column(db.Integer)
+    seller_id = db.Column(db.Integer)
     buyer_number = db.Column(db.Integer)
     seller_number = db.Column(db.Integer)
     reason = db.Column(db.String(50))

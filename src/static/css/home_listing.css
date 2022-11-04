@@ -1,0 +1,51 @@
+body{
+    margin-top: 4rem !important;
+}
+
+.col-md-8{
+    max-width: 100% !important;
+}
+
+.container{
+    max-width: 1290px !important;
+}
+
+.filter{
+    padding-bottom: 15px;
+    margin-bottom: 90px;
+    border-radius: 10px;
+    /* background-color: #2f6c6c; */
+    /* background-image: url('/static/images/assets/patternpad_3.svg');  */
+
+}
+
+.col-md-10{
+    max-width: 100% !important;
+}
+
+.no_bg_color{
+    background: transparent !important;
+}
+
+.position_btn{
+    margin-top: 4rem!important;
+}
+
+
+
+.row{
+    margin-right: -20px !important;
+    margin-left: -21px !important;
+}
+
+.listing-item{
+
+    /* background-image: url('/static/images/assets/patternpad_6.svg');  */
+    /* background-color: #d3d0d0; */
+    opacity: 0.90 !important;
+    background-color: #fff!important;
+}
+
+.home-end{
+    color: #fff;
+}

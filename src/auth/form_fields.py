@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, EmailField, Boolean
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email, DataRequired, Optional, NumberRange
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from datetime import datetime, date
+from ..models.users import User
 import phonenumbers
 
 
@@ -37,6 +38,7 @@ class RegistrationForm(FlaskForm):
     recaptcha = RecaptchaField()
 
     submit = SubmitField('Create')
+
 
     def validate_phone(self, phone):
         try:
@@ -110,26 +112,98 @@ class Update_User_Account(FlaskForm):
 
     submit = SubmitField('Update')
 
+class RequestResetForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField("Request Password Reset")
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('There is no account with that email. You must register first.')
+
+class ResetPasswordForm(FlaskForm):
+    password =  PasswordField('Password',
+                validators=[InputRequired(message='Password required'), 
+                Length(min=5, message='Password must not be less than five characters')])
+
+    confirm_password = PasswordField('Confirm password',
+                validators=[InputRequired(message='Password Required'), 
+                EqualTo('password', message='Passwords must match')])
+    submit = SubmitField("Reset Password")
+
 class AdminForm(FlaskForm):
     ac_login_email = EmailField('Account Login Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
     ac_login_pass = StringField('Account Login Password', 
                 validators=[InputRequired(message='Input required'),
                 Length(min=3, max=25, message='The password must be between 3 and 25 characters')])
-    user_id = IntegerField('User ID', validators=[InputRequired(message='User ID required'), NumberRange(min=1)])
+    buyer_id = IntegerField('Buyer ID', validators=[InputRequired(message='Buyer ID required'), NumberRange(min=1)])
     account_id = IntegerField('Account ID', validators=[InputRequired(message='Account ID required'), NumberRange(min=1)])
-
+    # type = SelectField('Account Category', choices=[('PURCHASE_INTENT', 'Purchase Intent'), ('ACCOUNT_PURCHASE_VERIFICATION', 'Account Purchase Verification'), ('SUCCESSFUL_PURCHASE', 'Successful Purchase'), ('FAILED_PURCHASE', 'Failed Purchase')])
+    # intent_message = StringField('Enter Intent Message')
+    # purchase_verification_message = StringField('Enter Purchase Verification Message')
+    # successful_purchase = StringField('Enter Successful Account Purchase Message')
+    # failed_purchase = StringField('Enter Failed Account Purchase Message')
     submit = SubmitField('Send')
 
 class Complaint(FlaskForm):
     buyer_phone_number = IntegerField('Enter your phone number', validators=[InputRequired(message='Phone number required required')])
     seller_phone_number = IntegerField('Enter seller\'s phone number', validators=[InputRequired(message='Phone number required required')])
     reason = SelectField('Select Reason', choices=[('Account Advertised was misleading'), ('Account credentials are incorrect'), ('Account is suspended'), ("Other reasons(can expound further below)")])
+    seller_id = HiddenField()
     extended_reason = TextAreaField('Further Description on the account problem(Optional)', [Optional(), Length(max=250)])
     submit = SubmitField("Reject")
 
-class Payment_Dropdown(FlaskForm):
+class Seller_Account_Details(FlaskForm):
+    account_name = StringField('Account Name', 
+                validators=[InputRequired(message='Account Name required'),
+                Length(min=3, max=25, message='Account Name must be between 3 and 25 characters')])
+    account_type = StringField('Account Type i.e medium', 
+                validators=[InputRequired(message='Account Type required'),
+                Length(min=3, max=25, message='Account Type must be between 3 and 25 characters')])
+    account_email = EmailField('Account Login Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+    account_url = StringField('Account Url', 
+                validators=[InputRequired(message='Account Url required'),
+                Length(min=3, max=150, message='Account Url must be between 3 and 25 characters')])
+    account_passphrase = PasswordField('Enter Account Password',
+                validators=[InputRequired(message='Password required')])
+    buyer_id = HiddenField()
+    account_id = HiddenField()
+    submit = SubmitField("Submit")
+
+
+class Payment_Method(FlaskForm):
     info = HiddenField()
-    submit = SubmitField("Leave To Checkout")
+    payment_method = SelectField('Choose Payment Method', choices=[('Paypal'), ('Mpesa')])
+    submit = SubmitField("Proceed To Checkout")
 
+class Confirmation_Form(FlaskForm):
+    confirmation_msg = StringField('Enter the confirmation message', 
+                validators=[InputRequired(message='Input required'),
+                Length(min=3, max=100, message='The password must be between 3 and 100 characters')])
+    submit = SubmitField("Send Message To Admin")
 
+class Payment_Status(FlaskForm):
+    account_id = HiddenField()
+    buyer_id = HiddenField()
+    seller_id = HiddenField()
+    success = SubmitField("Confirm Message")
+    failure = SubmitField("Reject Message")
 
+class Search(FlaskForm):
+    keyword = StringField(validators=[InputRequired(message='Search Keyword required'),
+                Length(min=3, max=30, message='Search Keyword must be between 3 and 30 characters')])
+    search = SubmitField()
+
+class FilteredSearch(FlaskForm):
+   article_ac =  BooleanField('Article Account')
+   academic_ac = BooleanField('Academic Writing Account')
+   blogging_ac = BooleanField('Blogging Account')
+   date_from = DateField('From Date (DD-MM-YYYY)', default=date.today())
+   date_to = DateField('To Date (DD-MM-YYYY)', default=date.today())
+   price_range_a = IntegerField('Between Price: ', validators=[NumberRange(min=1000, max=50000)])
+   price_range_b = IntegerField('To Price: ', validators=[NumberRange(min=1000, max=50000)])
+   search = SubmitField()
+
+   def validate_account_creation_date(form, date_from, date_to):
+        if date_from.data or date_to.data > date.today():
+            raise ValidationError("The searched date cannot be in the future!")

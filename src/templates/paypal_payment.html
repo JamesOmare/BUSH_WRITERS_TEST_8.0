@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <section id="hero" class="d-flex align-items-center">
+        <div class="container text-center" data-aos="zoom-in" data-aos-delay="100">
+            
+            <h2>Get now {{ subscription_period }} days access to this service for {{ price }} {{ currency }}</h2>
+            <div class="card d-flex border-0">
+                {#PayPal form start#}
+                <!-- Replace "test" with your own sandbox Business account app client ID -->
+                <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_business_client_id }}&currency={{ currency }}"></script>
+                <!-- Set up a container element for the button -->
+                <div class="d-flex align-content-stretch flex-wrap">
+                    <div class="card-body">
+                        <div id="paypal-button-container"></div>
+                        <script>
+                            paypal.Buttons({
+                                // Sets up the transaction when a payment button is clicked
+                                createOrder: (data, actions) => {
+                                    return actions.order.create({
+                                        purchase_units: [{
+                                            amount: {
+                                                value: '{{ price }}' // Can also reference a variable or function
+                                            }
+                                        }]
+                                    });
+                                },
+                                // Finalize the transaction after payer approval
+                                // Finalize the transaction on the server after payer approval
+                                onApprove: (data, actions) => {
+                                    return fetch(`/payment/${data.orderID}/capture`, {
+                                        method: "post",
+                                    })
+                                        .then((response) => response.json())
+                                        .then((orderData) => {
+                                            // Successful capture! For dev/demo purposes:
+                                            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                                            const transaction = orderData.purchase_units[0].payments.captures[0];
+                                            // alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
+                                            // When ready to go live, remove the alert and show a success message within this page. For example:
+                                            const element = document.getElementById('paypal-button-container');
+                                            element.innerHTML = '<p><h3><strong class="green_text"> Thank you for your payment!</strong></h3></p><p>Check your user profile for confirmation.</p>';
+                                            // Or go to another URL:  actions.redirect('thank_you.html');
+                                        });
+                                }
+                            }).render('#paypal-button-container');
+                        </script>
+                        {#            PayPal form end #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+    
+{% endblock content %}
+    
+
+
+{% block sidebar %}
+  <div class="col-md-4">
+    <div class="content-section">
+      <h3>Sell Account</h3>
+      <p class='text-muted'>Place an add on an account you want to sell.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+
+      <br/>
+
+      <h3>Buy Account</h3>
+      <p class='text-muted'>View marketplace to explore listings on accounts for sale.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+      <br/>
+
+      <h3>Chat Application</h3>
+      
+
+      <p class='text-muted'>Place an add on an account you want to sell.
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-light">Latest Posts</li>
+          <li class="list-group-item list-group-item-light">Announcements</li>
+          <li class="list-group-item list-group-item-light">Calendars</li>
+          <li class="list-group-item list-group-item-light">etc</li>
+        </ul>
+      </p>
+
+    </div>
+  </div>
+  <br/>
+
+{% endblock sidebar %}
+
+{% block footer %}
+<div class="border-top pt-3"></div>
+<div class="container footer-container">
+  <footer class="py-5">
+    <div class="row">
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-5 offset-md-1 mb-3">
+        <form>
+          <h5 class="text-white">Subscribe to our newsletter</h5>
+          <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
+          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+            <label for="newsletter1" class="visually-hidden">Email address</label>
+            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
+            <button class="btn btn-primary" type="button">Subscribe</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
+      <p class="text-white">&copy; 2022 Company, Inc. All rights reserved.</p>
+      <ul class="list-unstyled d-flex">
+        <i class="bi bi-twitter p-2 text-white"></i>
+        <i class="bi bi-instagram p-2 text-white"></i>
+        <i class="bi bi-facebook p-2 text-white"></i>
+        <li class="ms-3"><a class="text-white" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"/></svg></a></li>
+        <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"/></svg></a></li>
+        <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"/></svg></a></li>
+      </ul>
+    </div>
+  </footer>
+</div>
+{% endblock footer %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  
+{% endblock scripts %}

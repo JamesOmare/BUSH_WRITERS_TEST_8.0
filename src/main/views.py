@@ -1,6 +1,9 @@
 import os
 import secrets
-import uuid
+import requests
+from requests.auth import HTTPBasicAuth
+import base64
+from datetime import datetime
 import PIL.Image
 from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify, current_app
 from ..models.accounts import Account
@@ -17,7 +20,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import and_, desc,asc
 from datetime import date
 from werkzeug.utils import secure_filename
-
+from decouple import config
 
 main = Blueprint('main', __name__)
 
@@ -43,7 +46,7 @@ def search_results():
 
         # query the database
         accounts = accounts.filter(Account.description.like('%' + keyword + '%'))
-        accounts = accounts.order_by(Account.account_type).paginate(page=page, per_page=2)
+        accounts = accounts.order_by(Account.account_type).paginate(page=page, per_page=10)
         return render_template('search.html', form = form, logged_in_user=current_user, keyword = keyword, account = accounts, purchase_form = purchase_form)
 
     # if filter_form.validate_on_submit():
@@ -93,15 +96,22 @@ def search_results():
 @main.route('/', methods = ['GET', 'POST'])
 def viewpage():
     page = request.args.get('page', 1, type=int)
-    account = Account.query.filter_by(status = 0).paginate(page=page, per_page=2)
+    account = Account.query.filter_by(status = 0).paginate(page=page, per_page=10)
     search_form = Search()
     purchase_form = Payment_Method()
    
     if request.method == 'POST' and purchase_form.validate_on_submit():
         account_id = purchase_form.info.data
         payment_method = purchase_form.payment_method.data
-        print(payment_method)
-        return redirect(url_for('main.payment', product_id = account_id))
+        account_seller = Account.query.filter_by(account_id = account_id).first()
+        if payment_method == 'Mpesa':
+            buyer_id = current_user.id
+            seller_id = account_seller.user_id
+            return redirect(url_for('main.mpesa_payment', product_id = account_id, buyer_id = buyer_id, seller_id = seller_id))
+        elif payment_method == 'Paypal':
+            return redirect(url_for('main.paypal_payment', product_id = account_id, buyer_id = buyer_id, seller_id = seller_id))
+        else:
+            return render_template('404.html'), 404
     return render_template('view3.html', account=account, logged_in_user=current_user, purchase_form = purchase_form, form = search_form)
 
 @main.route('/product_view/<item_id>')
@@ -376,12 +386,119 @@ def chat(id):
 
     # else:
     #     return render_template('chat.html')
-    
-@main.route('/payment/<product_id>', methods = ['GET', 'POST'])
-def payment(product_id):
+
+
+
+
+#paypal operations
+def paypal_capture_function(order_id):
+    post_route = f"/v2/checkout/orders/{order_id}/capture"
+    paypal_capture_url = config('PAYPAL_API_URL') + post_route
+    basic_auth = HTTPBasicAuth(config('PAYPAL_BUSINESS_CLIENT_ID'), config('PAYPAL_BUSINESS_SECRET'))
+    headers = {
+        "Content-Type": "application/json",
+    }
+    response = requests.post(url=paypal_capture_url, headers=headers, auth=basic_auth)
+    response.raise_for_status()
+    json_data = response.json()
+    return json_data
+ 
+def is_approved_payment(captured_payment):
+    status = captured_payment.get("status")
+    amount = captured_payment.get("purchase_units")[0].get("payments").get("captures")[0].get("amount").get("value")
+    currency_code = captured_payment.get("purchase_units")[0].get("payments").get("captures")[0].get("amount").get(
+        "currency_code")
+    print(f"Payment happened. Details: {status}, {amount}, {currency_code}")
+    if status == "COMPLETED":
+        return True
+    else:
+        return False
+
+@main.route("/payment")
+def paypal_payment():
+    return render_template("paypal_payment.html", paypal_business_client_id=config('PAYPAL_BUSINESS_CLIENT_ID'),
+                           price=config('IB_TAX_APP_PRICE'), currency=config('IB_TAX_APP_PRICE_CURRENCY'))
+
+@main.route("/payment/<order_id>/capture", methods=["POST"])
+def capture_payment(order_id):  # Checks and confirms payment
+    captured_payment = paypal_capture_function(order_id)
+    # print(captured_payment)
+    if is_approved_payment(captured_payment):
+        # Do something (for example Update user field)
+        pass
+    return jsonify(captured_payment)
+
+
+
+#mpesa operations
+
+# get access token
+def getAccesstoken():
+    consumer_key = config('CONSUMER_KEY')
+    consumer_secret = config('CONSUMER_SECRET')
+    api_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+
+    # make a get request using python requests liblary
+    r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
+    access_token = r.json()['access_token']
+    return access_token
+
+
+@main.route('/payment/<product_id>/<payment_method>', methods = ['GET', 'POST'])
+def mpesa_payment(product_id, payment_method):
     account = Account.query.filter_by(account_id = product_id).first()
+
+    if payment_method == 'Mpesa':
+        return render_template()
     
     return render_template('payment.html', account = account)
+
+
+my_endpoint = 'https://cdbf-102-2-160-42.in.ngrok.io'
+
+
+# Initialize M-PESA Express request
+# /pay?phone=&amount=1
+@main.route('/pay')
+def MpesaExpress():
+    amount = request.args.get('amount')
+    phone = request.args.get('phone')
+
+    endpoint = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    access_token = getAccesstoken()
+    headers = {
+        "Authorization": "Bearer %s" % access_token
+    }
+    Timestamp = datetime.now()
+    times = Timestamp.strftime('%Y%m%d%H%M%S')
+    password = '174379' + 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919' + times
+    password = base64.b64encode(password.encode('utf-8')).decode()
+
+    data = {
+        "BusinessShortCode" : "174379",
+        "Password": password,
+        "Timestamp": times,
+        "TransactionType": "CustomerBuyGoodsOnline",
+        "PartyA": phone,
+        "PartyB": "174379",
+        "PhoneNumber": phone,
+        "CallBackURL": my_endpoint + "/lnmo-callback",
+        "AccountReference": "TestPay",
+        "TransactionDesc": "HelloTest",
+        "Amount": amount
+
+    }
+
+    res = requests.post(endpoint, json = data, headers = headers)
+    return res.json()
+
+
+#consume M-PESA Express callback
+@main.route('/lnmo-callback', methods=['POST'])
+def incoming():
+    data = request.get_json()
+    print(data)
+    return "OK"
 
 
 @main.route('/on_progress/<product_id>', methods = ['POST', 'GET'])
@@ -405,7 +522,7 @@ def on_progress(product_id):
 
         flash('Confirmation message send to admin sucessfully, please wait.', 'success')
         return render_template('confirmation_message.html', form = confirmation_form)
-    return render_template('confirmation_message.html', form = confirmation_form)
+    return render_template('confirmation2.html', form = confirmation_form)
 
 # @main.route('/verification_stage/<product_id>', methods = ['POST', 'GET'])
 # def verification_stage(product_id):

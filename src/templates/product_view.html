@@ -56,7 +56,7 @@
           </section>
 
           <!-- Modal -->
-          <div class="modal fade" id="gallery-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <!-- <div class="modal fade" id="gallery-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
@@ -67,14 +67,16 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <!-- End Gallery Section -->
 
           <!-- Content section -->
           <div class="row align-items-md-stretch">
             <div class="col-md-6">
               <div class="h-100 p-5 text-bg-dark rounded-3 product-content">
-                <h2 class="text-white mb-2 fw-bold fs-1">{{ account.account_type.value | replace("_", "  ") | title }}</h2>
+                <div class="mb-3">
+                  <h2 class="text-white mb-2 fw-bold fs-1">{{ account.account_type.value | replace("_", "  ") | title }}</h2>
+                </div>
                 <div class="mb-3 title-time-display">
                   <span class="text-white"><i class="bi bi-clock-history p-1"></i>Posted: {{ moment(account.time_posted).fromNow(refresh=True) }}</span>
                 </div>
@@ -85,23 +87,151 @@
                 <div class="rounded bg-light p-2 mb-3">
                   <p class="text-dark">{{ account.description }}</p>
                 </div>
-                <!-- <div class="d-grid gap-2 col-6 mx-auto">
-                  <button class="btn btn-primary" type="button">Purchase</button>
-                  <button class="btn btn-success" type="button">View Profile</button>
-                </div> -->
+                
                 <div>
-                  <button class="btn btn-primary" type="button">Purchase</button>
-                  <button class="btn btn-success" type="button">View Profile</button>
+                  {% if account.user_id != current_user.id %}
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#payment-form">Purchase</button>
+                  <a href="{{ url_for('main.user_profile', id = account.user_id ) }}" role="button" class="btn btn-success">View Profile</a>      
+                  {% else %}
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#upload-image">Upload Images</button>
+                  {% endif %}
+                  
                 </div>
               </div>
             </div>
             
+          </div>
+
+          <!-- Upload Images Form -->
+          <div class="modal fade" id="upload-image" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form>
+                    <div class="mb-3">
+                      <label for="recipient-name" class="col-form-label">Recipient:</label>
+                      <input type="text" class="form-control" id="recipient-name">
+                    </div>
+                    <div class="mb-3">
+                      <label for="message-text" class="col-form-label">Message:</label>
+                      <textarea class="form-control" id="message-text"></textarea>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Send message</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Modal -->
+          <div class="modal fade" id="payment-form" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header bg-dark">
+                  <h5 class="modal-title text-white" id="staticBackdropLabel">Purchase Options</h5>
+                  <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <h5>Choose Payment Option</h5>
+                    <hr>
+                    <h5>Use the dropdown below to select your payment method.</h5>
+                    <form action="" method="POST">
+
+                        {{ purchase_form.csrf_token }}
+                        {{ purchase_form.hidden_tag(purchase_form.info()) }}
+
+                        {{ purchase_form.info(value='{}'.format(account.account_id)) }}
+                        {{ purchase_form.payment_method() }}
+                        <hr>
+                        <p>
+                            {{ purchase_form.submit(class="btn btn-secondary") }}
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Exit</button>
+                        </p>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer bg-dark">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
           </div>
     </div>
     <br>
     <br>
     
 {% endblock content %}
+
+
+{% block sidebar %}
+  <div class="col-md-4 sidebar">
+    <div class="content-section">
+      <h3 class="text-white">Account Information</h3>
+      
+      <hr class="text-white">
+      <!-- card widget container -->
+      <p class="text-white">This account is valued at:</p>
+              <!--Widget Start-->
+              <div class="card-body card-sidebar color1">
+                <div class="float-left">
+                  <p>Price</p>
+                    <h3>
+                        <span class="currency">Ksh</span>
+                       
+                        <span class="count"> {{ "{:,.0f}".format(account.price ) }}</span>
+                    </h3>
+                   
+                </div>
+                <div class="float-right">
+                  <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+            <!--Widget End-->
+            <hr class="text-white">
+
+            <p class="text-white">This account is from the publication:</p>
+            <!--Widget Start-->
+            <div class="card-body card-sidebar color2">
+                <div class="float-left">
+                  <p>Publication</p>
+                    <h3>
+                        <span class="count">{{ account.brand }}</span>
+                    </h3>
+                    
+                </div>
+                <div class="float-right">
+                  <i class="bi bi-journal-text"></i>
+                </div>
+            </div>
+            <!--Widget End-->
+            <hr class="text-white">
+
+            <p class="text-white">This account has a rating of:</p>
+            <!--Widget Start-->
+            <div class="card-body card-sidebar color3">
+                <div class="float-left">
+                  <p>Rating</p>
+                    <h3>
+                        <span class="count">High</span>
+                    </h3>
+                    
+                </div>
+                <div class="float-right">
+                  <i class="bi bi-patch-check-fill"></i>
+                </div>
+            </div>
+          <!--Widget End-->
+    </div>
+  </div>
+{% endblock sidebar %}
+
 
 {% block footer %}
 <div class="border-top pt-3"></div>
@@ -168,60 +298,6 @@
   </footer>
 </div>
 {% endblock footer %}
-
-{% block sidebar %}
-  <div class="col-md-4 sidebar">
-    <div class="content-section">
-      <h3>Account Information</h3>
-      <!-- card widget container -->
-              <!--Widget Start-->
-              <div class="card-body color1">
-                <div class="float-left">
-                  <p>Price</p>
-                    <h3>
-                        <span class="currency">Ksh</span>
-                       
-                        <span class="count"> {{ "{:,.0f}".format(account.price ) }}</span>
-                    </h3>
-                   
-                </div>
-                <div class="float-right">
-                  <i class="bi bi-cash-stack"></i>
-                </div>
-            </div>
-            <!--Widget End-->
-            <!--Widget Start-->
-            <div class="card-body color2">
-                <div class="float-left">
-                  <p>Publication</p>
-                    <h3>
-                        <span class="count">{{ account.brand }}</span>
-                    </h3>
-                    
-                </div>
-                <div class="float-right">
-                  <i class="bi bi-journal-text"></i>
-                </div>
-            </div>
-            <!--Widget End-->
-            <!--Widget Start-->
-            <div class="card-body color3">
-                <div class="float-left">
-                  <p>Rating</p>
-                    <h3>
-                        <span class="count">High</span>
-                    </h3>
-                    
-                </div>
-                <div class="float-right">
-                  <i class="bi bi-patch-check-fill"></i>
-                </div>
-            </div>
-          <!--Widget End-->
-    </div>
-  </div>
-{% endblock sidebar %}
-  
     
 {% block scripts %}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>

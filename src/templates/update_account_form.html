@@ -12,7 +12,7 @@
         <img class="rounded-circle account-img" src="{{ image_file }}">
         <div class="media-body">
           <h2 class="account-heading">{{ current_user.username }}</h2>
-          <p class="text-secondary">{{ current_user.email }}</p>
+          <p class="text-secondary">Primary Email: {{ current_user.email }}</p>
         </div>
       </div>
         <form method="POST" action="" enctype="multipart/form-data">
@@ -82,6 +82,22 @@
                     {% endif %}
                 </div>
 
+                 <!-- Profile Description field -->
+                 <div class="form-group">
+                    {{ form.profile_details.label(class="form-control-label") }}
+                    {% if form.profile_details.errors %}
+                        {{ form.profile_details(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.profile_details.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.profile_details(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <br>
+
                 <!-- Profile picture field -->
                 <div class="form-group">
                     {{ form.profile_image.label() }}
@@ -92,11 +108,12 @@
                         {% endfor %}
                     {% endif %}
                 </div>
+                <br>
 
             </fieldset>
 
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form.submit(class="btn btn-info") }}
             </div>
         </form>
     </div>

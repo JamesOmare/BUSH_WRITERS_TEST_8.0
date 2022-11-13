@@ -19,6 +19,7 @@ class User(UserMixin ,db.Model):
     profile_photo = db.Column(db.String(80), nullable=True, default='default_profile.gif')
     date_created = db.Column(db.DateTime (timezone = True), default = func.now())
     active = db.Column(db.Boolean, default=True)
+    profile_description = db.Column(db.String(100), default = 'Hello There 👋')
     admin = db.Column(db.Boolean(), default=False) 
     account = db.relationship('Account', backref = 'user', passive_deletes = True)
     images = db.relationship('Image', backref = 'user', passive_deletes = True )

@@ -13,6 +13,10 @@ h1, h2, h3, h4, h5, h6 {
   color: #444444;
 }
 
+a{
+  text-decoration: none;
+}
+
 .navbar-color{
   background-color: #2f6c6c;
 }
@@ -49,11 +53,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .content-section {
-  background: #ffffff;
+  background: #2f6c6c;
   padding: 10px 20px;
   border: 1px solid #dddddd;
-  border-radius: 3px;
+  border-radius: 25px;
   margin-bottom: 20px;
+  opacity: 0.95;
 }
 
 .article-title {
@@ -313,4 +318,24 @@ a.article-title:hover {
 
 .sidebar{
   border-radius: 10px;
+}
+
+.side-title{
+  color: #000 !important;
+}
+
+.side-text{
+  color: #fff !important;
+}
+
+.login-form{
+  background-color: #102c2c;
+  border-radius: 10px;
+  opacity: 0.9;
+}
+
+.register-form{
+  background-color: #102c2c;
+  border-radius: 10px;
+  opacity: 0.9;
 }

@@ -25,14 +25,6 @@ from decouple import config
 main = Blueprint('main', __name__)
 
 
-# @main.route('/view')
-# def homepage():
-#     page = request.args.get('page', 1, type=int)
-#     account = Account.query.filter_by(status = 0).paginate(page=page, per_page=2)
-#     search_form = Search()
-   
-#     return render_template('view3.html', account=account, logged_in_user=current_user, form = search_form)
-
 @main.route('/search', methods = ['POST', 'GET'])
 def search_results():
     form = Search()
@@ -109,18 +101,36 @@ def viewpage():
             seller_id = account_seller.user_id
             return redirect(url_for('main.mpesa_payment', product_id = account_id, buyer_id = buyer_id, seller_id = seller_id))
         elif payment_method == 'Paypal':
+            buyer_id = current_user.id
+            seller_id = account_seller.user_id
             return redirect(url_for('main.paypal_payment', product_id = account_id, buyer_id = buyer_id, seller_id = seller_id))
         else:
             return render_template('404.html'), 404
-    return render_template('view3.html', account=account, logged_in_user=current_user, purchase_form = purchase_form, form = search_form)
+    return render_template('view.html', account=account, logged_in_user=current_user, purchase_form = purchase_form, form = search_form)
 
-@main.route('/product_view/<item_id>')
+@main.route('/product_view/<item_id>', methods=['GET', 'POST'])
 def product_view(item_id):
     account = Account.query.filter_by(account_id = item_id).first()
     images = Image.query.filter_by(account_id = item_id).all()
+    purchase_form = Payment_Method()
+   
+    if request.method == 'POST' and purchase_form.validate_on_submit():
+        account_id = purchase_form.info.data
+        payment_method = purchase_form.payment_method.data
+        account_seller = Account.query.filter_by(account_id = account_id).first()
+        if payment_method == 'Mpesa':
+            buyer_id = current_user.id
+            seller_id = account_seller.user_id
+            return redirect(url_for('main.mpesa_payment', product_id = account_id, buyer_id = buyer_id, seller_id = seller_id))
+        elif payment_method == 'Paypal':
+            buyer_id = current_user.id
+            seller_id = account_seller.user_id
+            return redirect(url_for('main.paypal_payment', product_id = account_id, buyer_id = buyer_id, seller_id = seller_id))
+        else:
+            return render_template('404.html'), 404
 
     # print("Account ID: ",current_user.account_id)
-    return render_template('product_view.html', account = account, images = images)
+    return render_template('product_view.html', account = account, images = images, purchase_form = purchase_form)
 
 
 @main.route('/user_profile/<id>')
@@ -135,12 +145,12 @@ def user_profile(id):
     #     notification = False
     notification = True if msg else False
 
-    if current_user.id != user.id:
-        flash('You do not have permission to enter this page', category='error')
-        return redirect(url_for('auth.login'))
-    else:
-        accounts = Account.query.filter_by(user_id = current_user.id).all()
-        return render_template('user_profile.html', accounts = accounts, account_holder = current_user, notification = notification)
+    # if current_user.id != user.id:
+    #     flash('You do not have permission to enter this page', category='error')
+    #     return redirect(url_for('auth.login'))
+    
+    accounts = Account.query.filter_by(user_id = current_user.id).all()
+    return render_template('user_profile.html', accounts = accounts, account_holder = user, notification = notification)
   
 
 
@@ -221,7 +231,7 @@ def seller():
 
         return redirect(url_for("main.viewpage"))
 
-    return render_template('seller_prompt2.html', form=seller_form)
+    return render_template('seller_form.html', form=seller_form)
 
 @main.route('/update', methods = ['GET', 'POST'])
 def update_profile():
@@ -231,6 +241,7 @@ def update_profile():
         firstname = update_form.first_name.data
         lastname = update_form.last_name.data
         phone_number = update_form.phone.data
+        profile_description = update_form.profile_details.data
         profile_image = update_form.profile_image.data
         if profile_image:
             picture_file = save_picture_thumbnail(profile_image)
@@ -238,6 +249,7 @@ def update_profile():
         current_user.username = firstname + " " + lastname
         current_user.email = email
         current_user.phone_number = phone_number
+        current_user.profile_description = profile_description
         db.session.commit()
         flash('Your account has been updated!', 'success')
         return redirect(url_for('main.user_profile', id = current_user.id))
@@ -248,6 +260,7 @@ def update_profile():
         update_form.last_name.data = last_name
         update_form.email.data = current_user.email
         update_form.phone.data = current_user.phone_number
+        update_form.profile_details.data = current_user.profile_description
         update_form.profile_image.data = current_user.profile_photo
     image_file = url_for('static', filename='images/profile_pics/' + current_user.profile_photo)
     return render_template('update_account_form.html', title='Account',
@@ -255,6 +268,7 @@ def update_profile():
 
 
 @main.route('/chat_page/<id>', methods = ['GET', 'POST'])
+@login_required
 def chat(id):
     buyer_msg = Message.query.filter_by(buyer_id = id).all()
     seller_msg = Message.query.filter_by(seller_id = id).all()
@@ -415,11 +429,13 @@ def is_approved_payment(captured_payment):
         return False
 
 @main.route("/payment")
+@login_required
 def paypal_payment():
     return render_template("paypal_payment.html", paypal_business_client_id=config('PAYPAL_BUSINESS_CLIENT_ID'),
                            price=config('IB_TAX_APP_PRICE'), currency=config('IB_TAX_APP_PRICE_CURRENCY'))
 
 @main.route("/payment/<order_id>/capture", methods=["POST"])
+@login_required
 def capture_payment(order_id):  # Checks and confirms payment
     captured_payment = paypal_capture_function(order_id)
     # print(captured_payment)
@@ -445,6 +461,7 @@ def getAccesstoken():
 
 
 @main.route('/payment/<product_id>/<payment_method>', methods = ['GET', 'POST'])
+@login_required
 def mpesa_payment(product_id, payment_method):
     account = Account.query.filter_by(account_id = product_id).first()
 
@@ -460,6 +477,7 @@ my_endpoint = 'https://cdbf-102-2-160-42.in.ngrok.io'
 # Initialize M-PESA Express request
 # /pay?phone=&amount=1
 @main.route('/pay')
+@login_required
 def MpesaExpress():
     amount = request.args.get('amount')
     phone = request.args.get('phone')
@@ -495,6 +513,7 @@ def MpesaExpress():
 
 #consume M-PESA Express callback
 @main.route('/lnmo-callback', methods=['POST'])
+@login_required
 def incoming():
     data = request.get_json()
     print(data)
@@ -502,6 +521,7 @@ def incoming():
 
 
 @main.route('/on_progress/<product_id>', methods = ['POST', 'GET'])
+@login_required
 def on_progress(product_id):
     account = Account.query.filter_by(account_id = product_id).first()
     confirmation_form = Confirmation_Form()

@@ -8,15 +8,15 @@
     
 
 {% block content %}
-    <div class="content-section">
+    <div class="content-section login-form">
         <form action="" method="POST">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Login To Account</legend>
+                <legend class="border-bottom mb-4 text-white">Login To Account</legend>
 
                 <!-- Email Field -->
                 <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
+                    {{ form.email.label(class="form-control-label text-white") }}
                     {% if form.email.errors %}
                         {{ form.email(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -32,7 +32,7 @@
 
                 <!-- Password field -->
                 <div class="form-group">
-                    {{ form.password.label(class="form-control-label") }}
+                    {{ form.password.label(class="form-control-label text-white") }}
                     {% if form.password.errors %}
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -49,20 +49,20 @@
                 <!--Remeber Me Feild -->
                 <div class="form-check">
                     {{ form.remember(class="form-check-input") }}
-                    {{ form.remember.label(class="form-check-label") }}
+                    {{ form.remember.label(class="form-check-label text-white") }}
                 </div>
                 <br/>
 
             </fieldset>
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form.submit(class="btn btn-primary") }}
                 <small class="text-muted ml-2">
                     <a href="{{ url_for('auth.reset_request') }}">Forgot Password?</a>
                 </small>
             </div>
             <br>
             <div class="border-top pt-3">
-                <small class="text-muted">
+                <small class="text-muted text-white">
                     Need An Account? <a class="ml-2" href="{{ url_for('auth.register') }}">Sign Up</a>
                 </small>
             </div>

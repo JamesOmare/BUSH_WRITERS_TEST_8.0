@@ -31,8 +31,14 @@ def register():
             # check if email exists
             email_exists = User.query.filter_by(email=email).first()
 
+            #check if phone number exists
+            phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
+
             if email_exists:
                 flash('Email already exists, choose another one.', 'primary')
+            
+            elif phone_number_exists:
+                flash('The phone number provided already exists. Please enter another one!', 'primary')
 
             else:
                 new_user = User(
@@ -49,7 +55,7 @@ def register():
                 return redirect(url_for('auth.login'))
 
     
-    return render_template('register2.html', form=reg_form)
+    return render_template('register.html', form=reg_form)
 
 
 

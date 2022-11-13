@@ -106,6 +106,9 @@ class Update_User_Account(FlaskForm):
 
     profile_image = FileField('Update Account Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
 
+    profile_details = StringField('Enter Profile Description', 
+                validators=[ Length(max=100, message='The description must be less than 100 characters')])
+
     email = EmailField('Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
 
     phone = StringField('Phone Number', validators=[DataRequired()])

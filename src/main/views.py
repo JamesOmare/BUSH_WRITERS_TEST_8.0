@@ -490,7 +490,7 @@ def MpesaExpress():
     Timestamp = datetime.now()
     times = Timestamp.strftime('%Y%m%d%H%M%S')
     password = '174379' + 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919' + times
-    password = base64.b64encode(password.encode('utf-8')).decode()
+    password = base64.b64encode(password.encode('utf-8'))
 
     data = {
         "BusinessShortCode" : "174379",

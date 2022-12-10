@@ -210,3 +210,8 @@ class FilteredSearch(FlaskForm):
    def validate_account_creation_date(form, date_from, date_to):
         if date_from.data or date_to.data > date.today():
             raise ValidationError("The searched date cannot be in the future!")
+
+class Mpesa_Confirm(FlaskForm):
+    phone_number = StringField(validators=[InputRequired(message='Phone Number required'),
+                Length(min=10, max=15, message='Phone number must be at least 10 characters')])
+    pay = SubmitField('Make Payment')

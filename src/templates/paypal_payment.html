@@ -18,7 +18,7 @@
     <section id="hero" class="d-flex align-items-center">
         <div class="container text-center" data-aos="zoom-in" data-aos-delay="100">
             
-            <h2>Get now {{ subscription_period }} days access to this service for {{ price }} {{ currency }}</h2>
+            <h2>Hello {{ current_user.username }}, confirm purchase of the selected account for {{ price }} {{ currency }}</h2>
             <div class="card d-flex border-0">
                 {#PayPal form start#}
                 <!-- Replace "test" with your own sandbox Business account app client ID -->
@@ -42,7 +42,7 @@
                                 // Finalize the transaction after payer approval
                                 // Finalize the transaction on the server after payer approval
                                 onApprove: (data, actions) => {
-                                    return fetch(`/payment/${data.orderID}/capture`, {
+                                    return fetch(`/payment/${data.orderID}/capture/{{ product_id }}/{{ buyer_id }}/{{ seller_id }}`, {
                                         method: "post",
                                     })
                                         .then((response) => response.json())
@@ -53,8 +53,10 @@
                                             // alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
                                             // When ready to go live, remove the alert and show a success message within this page. For example:
                                             const element = document.getElementById('paypal-button-container');
-                                            element.innerHTML = '<p><h3><strong class="green_text"> Thank you for your payment!</strong></h3></p><p>Check your user profile for confirmation.</p>';
+                                            element.innerHTML = '<p><h3><strong class="green_text"> Thank you {{current_user.username}} for your payment!</strong></h3></p><p>Check your notifications on your user profile for confirmation and further notices.</p> <p><a href="{{url_for("main.chat", id=buyer_id)}}" class="btn btn-dark btn-sm mt-2">Go To Notifications</a></p>';
                                             // Or go to another URL:  actions.redirect('thank_you.html');
+
+                                            
                                         });
                                 }
                             }).render('#paypal-button-container');

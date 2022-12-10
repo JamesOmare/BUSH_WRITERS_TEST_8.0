@@ -1,236 +1,335 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-        />
-        <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-            rel="stylesheet"
-        />
-        <script
-            type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
-        ></script>
-        <link
-            rel="stylesheet"
-            type="text/css"
-            href="{{ url_for('static', filename='css/payment.css') }}"
-        />
 
-        <title>Document</title>
-    </head>
-    <body>
-        <div class="container d-flex justify-content-center mt-5 mb-5">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <span>Payment Method</span>
-                    <div class="card">
-                        <div class="accordion" id="accordionExample">
-                            <!-- Paypal Section -->
-                            <div class="card">
-                                <div class="card-header p-0" id="headingTwo">
-                                    <h2 class="mb-0">
-                                        <button
-                                            class="btn btn-light btn-block text-left collapsed p-3 rounded-0 border-bottom-custom"
-                                            type="button"
-                                            data-toggle="collapse"
-                                            data-target="#collapseTwo"
-                                            aria-expanded="false"
-                                            aria-controls="collapseTwo"
-                                        >
-                                            <div
-                                                class="d-flex align-items-center justify-content-between"
-                                            >
-                                                <span>Paypal</span>
-                                                <img
-                                                    src="{{url_for('static', filename='images/assets/paypal.png' )}}"
-                                                    alt="paypal_image"
-                                                    width="35"
-                                                />
-                                            </div>
-                                        </button>
-                                    </h2>
-                                </div>
-                                <div
-                                    id="collapseTwo"
-                                    class="collapse"
-                                    aria-labelledby="headingTwo"
-                                    data-parent="#accordionExample"
-                                >
-                                    <div class="card-body">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            placeholder="Paypal email"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+  
 
-                            <!-- Mpesa Section -->
-                            <div class="card">
-                                <div class="card-header p-0">
-                                    <h2 class="mb-0">
-                                        <button
-                                            class="btn btn-light btn-block text-left p-3 rounded-0"
-                                            data-toggle="collapse"
-                                            data-target="#collapseOne"
-                                            aria-expanded="true"
-                                            aria-controls="collapseOne"
-                                        >
-                                            <div
-                                                class="d-flex align-items-center justify-content-between"
-                                            >
-                                                <span>Mpesa</span>
-                                                <div class="icons">
-                                                    <img
-                                                        src="{{url_for('static', filename='images/assets/mpesa.png' )}}"
-                                                        width="40"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </h2>
-                                </div>
+{% extends 'base.html' %}
 
-                                <div
-                                    id="collapseOne"
-                                    class="collapse show"
-                                    aria-labelledby="headingOne"
-                                    data-parent="#accordionExample"
-                                >
-                                    <div class="card-body payment-card-body">
-                                        <span
-                                            class="font-weight-normal card-text"
-                                            >Card Number</span
-                                        >
-                                        <div class="input">
-                                            <i class="fa fa-mobile-phone"></i>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="0000 0000 0000 0000"
-                                            />
-                                        </div>
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" >
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/card-styles.css') }}" >
+    
+{% endblock %}
 
-                                        <div class="row mt-3 mb-3">
-                                            <div class="col-md-6">
-                                                <span
-                                                    class="font-weight-normal card-text"
-                                                    >Expiry Date</span
-                                                >
-                                                <div class="input">
-                                                    <i
-                                                        class="fa fa-calendar"
-                                                    ></i>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        placeholder="MM/YY"
-                                                    />
-                                                </div>
-                                            </div>
 
-                                            <div class="col-md-6">
-                                                <span
-                                                    class="font-weight-normal card-text"
-                                                    >CVC/CVV</span
-                                                >
-                                                <div class="input">
-                                                    <i class="fa fa-lock"></i>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        placeholder="000"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
+{% block content %}
+<div class="container content-section">
+  <div class="py-5 text-center">
+    <h2 class="text-white">Mpesa Checkout</h2>
+  </div>
+  <div id="addition">
 
-                                        <span
-                                            class="text-muted certificate-text"
-                                            ><i class="fa fa-lock"></i> Your
-                                            transaction is secured with ssl
-                                            certificate</span
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-7 order-md-2 mb-4">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-white">Summary</span>
+      </h4>
+      <ul class="list-group mb-3">
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">Account type</h6>
+            <small class="text-muted">{{account.account_type.value | replace("_", "  ") | title }}</small>
+          </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between bg-light">
+          <div>
+            <h6 class="my-0">Account name</h6>
+            <small class="text-muted">{{ account.account_name }}</small>
+          </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">Account Price</h6>
+            <small class="text-muted">Cost of the account listed</small>
+          </div>
+          <span class="text-success">ksh {{account.price}}/=</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between bg-light">
+          <div class="text-success">
+            <h6 class="my-0">Administration Charge</h6>
+            <small class="text-muted">Handling fee</small>
+          </div>
+          <span class="text-success">Ksh 200/=</span>
+        </li>
+        {% set total = account.price + 200 %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Total (KSH)</span>
+          <strong class="text-success">{{ total }}/=</strong>
+        </li>
+      </ul>
+    </div>
+
+
+    <div class="col-md-5 order-md-1">
+      <h4 class="mb-3 text-white">
+        <span class="text-white p-2">Payment Method</span>
+        <span><img
+          src="{{url_for('static', filename='images/assets/mpesa.png' )}}"
+          width="60"
+      /></span>
+      </h4>
+      <form action="" method="POST" id = "form-submit">
+        {{ mpesa_form.csrf_token }}
+        {{ mpesa_form.hidden_tag() }}
+
+        <!-- Phone Number Field -->
+        <div class="row">
+          <div class="col-md-6 mb-3 ">
+            {{ mpesa_form.phone_number.label(class="form-control-label text-white") }}
+            {% if mpesa_form.phone_number.errors %}
+                {{ mpesa_form.phone_number(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in mpesa_form.phone_number.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
                 </div>
-
-                <div class="col-md-6">
-                    <span>Summary</span>
-
-                    <div class="card">
-                        <div class="d-flex justify-content-between p-3">
-                            <div class="d-flex flex-column">
-                                <span
-                                    >Pro(Billed Monthly)
-                                    <i class="fa fa-caret-down"></i
-                                ></span>
-                                <a href="#" class="billing"
-                                    >Save 20% with annual billing</a
-                                >
-                            </div>
-
-                            <div class="mt-1">
-                                <sup class="super-price">$9.99</sup>
-                                <span class="super-month">/Month</span>
-                            </div>
-                        </div>
-
-                        <hr class="mt-0 line" />
-
-                        <div class="p-3">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Refferal Bonouses</span>
-                                <span>-$2.00</span>
-                            </div>
-
-                            <div class="d-flex justify-content-between">
-                                <span>Vat <i class="fa fa-clock-o"></i></span>
-                                <span>-20%</span>
-                            </div>
-                        </div>
-
-                        <hr class="mt-0 line" />
-
-                        <div class="p-3 d-flex justify-content-between">
-                            <div class="d-flex flex-column">
-                                <span>Today you pay(US Dollars)</span>
-                                <small>After 30 days $9.59</small>
-                            </div>
-                            <span>$0</span>
-                        </div>
-
-                        <div class="p-3">
-                            <div >
-                                <a href = '/on_progress/{{ account.account_id }}'>
-                                    <button
-                                    class="btn btn-primary btn-block free-button">
-                                    Try it free for 30 days
-                                </a>
-                            </div>
-                            
-                            </button>
-                            <div class="text-center">
-                                <a href="#">Have a promo code?</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% else %}
+                {{ mpesa_form.phone_number(class="form-control form-control-lg phone-input", id = "phone_number") }}
+            {% endif %}
+          </div>
         </div>
-        <script
-            type="text/javascript"
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"
-        ></script>
-    </body>
-</html>
+        
+        <hr class="mb-4">
+        <div class="form-group">
+          {{ mpesa_form.pay(class="btn btn-warning btn-block me-5 mb-3 submit-btn") }}
+          <span id="spin"></span>
+        </div>
+        <div id="toast"></div>
+        
+        <!-- <div class="toast bg-dark text-white fade show mb-3" id="my-toast">
+          <div class="toast-header bg-success text-white">
+              <strong class="me-auto"><i class="bi bi-hourglass-split pe-2"></i>Delayed Response ?</strong>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+          </div>
+          <div class="toast-body">
+              If you have not received a success prompt on the current page and the mpesa confirmation message has already been sent to your phone, you can send the mpesa message to the admin below. <a href="{{ url_for('main.on_progress', product_id = account.account_id) }}" class="text-blue">Click here!</a>
+          </div>
+        </div> -->
+      </form>
+    </div>
+  </div>
+  
+  
+  
+</div>
+{% endblock content %}
+    
+{% block sidebar %}
+  <div class="col-md-4 sidebar">
+    <div class="content-section">
+      <!-- Sell Account Details -->
+      <h3 class="side-title">Sell Account</h3>
+      <p class='text-muted side-text'>Place an ad on an account you want to sell.
+        <!--Widget Start-->
+        <div class="card-body card-sidebar color1">
+          <div class="float-left">
+            <p>Account Ad</p>
+              <h3>
+                  <span class="currency">Sell</span>
+              </h3>
+            
+          </div>
+          <div class="float-right">
+            <i class="bi bi-cash-coin"></i>
+          </div>
+        </div>
+        <!--Widget End-->
+      </p>
+      <div class="d-grid gap-2 col-11 mx-auto">
+        <a href="{{ url_for('main.seller') }}" role="button" class="btn btn-warning">Sell Account</a>
+      </div>
+      <br/>
+      <hr class="text-white">
+
+      <h3 class="side-title">Buy Account</h3>
+      <p class='text-muted side-text'>View marketplace to explore listings on accounts for sale.
+       <!--Widget Start-->
+       <div class="card-body card-sidebar color2">
+        <div class="float-left">
+          <p>Visit</p>
+            <h3>
+                <span class="currency">Listings</span>
+            </h3>
+          
+        </div>
+        <div class="float-right">
+          <i class="bi bi-cart4"></i>
+        </div>
+      </div>
+      <!--Widget End-->
+      </p>
+      <div class="d-grid gap-2 col-11 mx-auto">
+        <a href="{{ url_for('main.viewpage') }}" role="button" class="btn btn-warning">Visit Marketplace</a>
+      </div>
+      <br/>
+      <hr class="text-white">
+
+
+      <h3 class="side-title">Customer Support</h3>
+      <p class='text-muted side-text'>Our Support center is always one call away.
+       <!--Widget Start-->
+       <div class="card-body card-sidebar color4">
+        <div class="float-left">
+          <p>Client</p>
+            <h3>
+                <span class="currency">Support</span>
+            </h3>
+        </div>
+        <div class="float-right">
+          <i class="bi bi-headset"></i>
+        </div>
+      </div>
+      <!--Widget End-->
+      </p>
+     
+
+    </div>
+  </div>
+  <br/>
+  
+{% endblock sidebar %}
+
+{% block footer %}
+<div class="border-top pt-3"></div>
+<div class="container footer-container">
+  <footer class="py-5">
+    <div class="row">
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2 mb-3">
+        <h5 class="text-white">Section</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
+          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-5 offset-md-1 mb-3">
+        <form>
+          <h5 class="text-white">Subscribe to our newsletter</h5>
+          <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
+          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+            <label for="newsletter1" class="visually-hidden">Email address</label>
+            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
+            <button class="btn btn-primary" type="button">Subscribe</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
+      <p class="text-white">&copy; 2022 Company, Inc. All rights reserved.</p>
+      <ul class="list-unstyled d-flex">
+        <i class="bi bi-twitter p-2 text-white"></i>
+        <i class="bi bi-instagram p-2 text-white"></i>
+        <i class="bi bi-facebook p-2 text-white"></i>
+        <li class="ms-3"><a class="text-white" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"/></svg></a></li>
+        <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"/></svg></a></li>
+        <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"/></svg></a></li>
+      </ul>
+    </div>
+  </footer>
+</div>
+{% endblock footer %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const form = document.getElementById('form-submit');
+    const number_input = document.querySelector('.phone-input')
+    form.addEventListener('submit', (e) => {
+
+        e.preventDefault()
+        phone_number = $('#phone_number').val()
+        $.ajax({
+          type: "POST",
+          url: "{{url_for('main.mpesa_payment', payment_method = 'Mpesa', product_id = account.account_id, buyer_id = buyer_id, seller_id = seller_id) }}",
+          data: {"number" : phone_number },
+          dataType: 'json',
+          
+        })
+
+        get_interval()
+      }
+    )
+
+    const get_interval = () => {
+      const spin = document.getElementById("spin");
+      [...spin.children].forEach((child) => child.remove());
+      spin.innerHTML +=
+                      ` <div class="spinner-border text-info px-2" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>`;
+
+      const toast = document.getElementById("toast");
+      [...toast.children].forEach((child) => child.remove());
+      toast.innerHTML += 
+                        `<div class="toast bg-dark text-white fade show mb-3" id="my-toast">
+                            <div class="toast-header bg-success text-white">
+                                <strong class="me-auto"><i class="bi bi-hourglass-split pe-2"></i>Delayed Response ?</strong>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                            </div>
+                            <div class="toast-body">
+                                If you have not received a success prompt on the current page and the mpesa confirmation message has already been sent to your phone, you can send the mpesa message to the admin below. <a href="{{ url_for('main.on_progress', product_id = account.account_id) }}" class="text-blue">Click here!</a>
+                            </div>
+                        </div>
+                        `
+      
+      
+      const interval = setInterval(frame, 30000);
+      function frame() {
+        fetch("{{ url_for('main.refresh', product_id = account.account_id) }}")
+        .then(response => { response.text()
+        .then(t => {
+              if (t == "accepted"){
+                const element = document.getElementById("spin");
+                [...element.children].forEach((child) => child.remove());
+                const element2 = document.getElementById("toast");
+                [...element2.children].forEach((child) => child.remove());
+                document.getElementById("addition").innerHTML +=
+                `<div class="card text-center">
+                    <div class="card-header p-3">
+                      <i class="bi bi-check-circle-fill">Success</i>
+                    </div>
+                    <div class="card-body">
+                      <h5 class="card-title"><b>Payment Confirmed</b></h5>
+                      <p class="card-text">We have received payment for the account purchased. Please go to notifications for further information.</p>
+                      <a href="{{url_for('main.chat', id=buyer_id)}}" class="btn btn-dark btn-sm mt-2">Go To Notifications</a>
+                    </div>
+                    <div class="card-footer p-4"></div>
+                </div>`;
+                clearInterval(interval)
+              }
+                    
+              })
+          });
+      };  
+  }
+    // get_interval()
+  </script>
+{% endblock scripts %}

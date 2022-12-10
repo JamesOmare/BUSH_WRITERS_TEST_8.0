@@ -6,13 +6,6 @@ from flask import redirect, url_for, request, g
 from flask_moment import Moment
 from flask_mail import Mail
 
-# class IndexView(AdminIndexView):
-#     @expose('/')
-#     def index(self):
-#         if not (g.user.is_authenticated and g.user.is_admin()):
-#             return redirect(url_for('login', next=request.path))
-#         return self.render('admin/index.html')
-
 
 db = SQLAlchemy()
 migrate = Migrate()

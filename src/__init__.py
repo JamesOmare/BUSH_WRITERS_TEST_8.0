@@ -5,7 +5,7 @@ from .auth.views import auth
 from .main.views import main
 from.utils import db, migrate, login_manager, admin, moment, mail
 from .models.users import User
-from .models.accounts import Account
+
 
 
 

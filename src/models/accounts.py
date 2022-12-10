@@ -28,6 +28,7 @@ class Account(db.Model):
     price = db.Column(db.Integer, nullable = False)
     status = db.Column(db.SmallInteger, default=STATUS_AVAILABLE)
     account_creation_date = db.Column(db.Date, nullable = False)
+    #needs to be time separately
     time_posted = db.Column(db.DateTime (timezone = True), default = func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'))
     images = db.relationship('Image', backref = 'account', passive_deletes = True, lazy='dynamic' )

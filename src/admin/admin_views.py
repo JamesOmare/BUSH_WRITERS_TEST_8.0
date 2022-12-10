@@ -12,7 +12,7 @@ from flask import g, url_for, flash, request, render_template
 from flask_admin.actions import action
 from sqlalchemy.sql import func
 from ..auth.form_fields import AdminForm, Payment_Status
-from ..models.messages import Message
+from ..models.notification import Notification
 from ..models.complaints import Complaints
 
 # class AdminAuthentication(object):
@@ -288,7 +288,7 @@ class FormView(BaseView):
                 login_pass = form.ac_login_pass.data
                 buyer_id = form.buyer_id.data
                 account_id = form.account_id.data
-                new_msg = Message(
+                new_msg = Notification(
                     login_password = login_pass,
                     login_email = login_email,
                     type = 2,
@@ -298,7 +298,7 @@ class FormView(BaseView):
 
                 db.session.add(new_msg)
                 db.session.commit()
-                flash('Message sent succcessfully to recipient', 'success')
+                flash('Notification sent succcessfully to recipient', 'success')
                 return self.render('admin/form.html', form = form)
         return self.render('admin/form.html', form = form)
 
@@ -427,7 +427,7 @@ class Confirmation_Message(BaseView):
                     print('Account status was: ', account.status, 'Account id: ', account_id)
                     account.status = 2
                     # db.session.refresh(account)
-                    db.session.merge(account)
+                    # db.session.merge(account)
                     db.session.commit()
                     # print('Account session: ' , Account.query.session.connection().engine)
                     # print('db session: ', db.session.connection().engine)
@@ -438,7 +438,7 @@ class Confirmation_Message(BaseView):
                     # print(db.session.connection().engine.url)
                     alert_message = True
                     alert_type = 0
-                    alert = Message(
+                    alert = Notification(
                         buyer_id = buyer_id,
                         seller_id = seller_id,
                         account_id = account_id,

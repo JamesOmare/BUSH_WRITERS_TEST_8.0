@@ -8,7 +8,7 @@ class Confirmation(UserMixin ,db.Model):
 
     __tablename__ = 'confirmation'
     id = db.Column(db.Integer, primary_key = True)
-    confirmation_msg = db.Column(db.String(150), unique=True, nullable = False)
+    confirmation_msg = db.Column(db.String(500), unique=True, nullable = False)
     buyer_id = db.Column(db.String(120) )
     buyer_email = db.Column(db.String(120))
     seller_id = db.Column(db.String(10))

@@ -16,6 +16,20 @@ class HelloView(BaseView):
     def is_accessible(self): 
         return current_user.is_authenticated and current_user.is_admin()
 
+# def send_confirm_email(user):
+#     token = user.get_reset_token()
+#     msg = Message('Confirm Email Verification', 
+#                     sender='bluescrubs254@gmail.com', 
+#                     recipients=[user.email]
+#                     )
+#     msg.body = f"""  To finish up the registration process, please click the following link: 
+#     {url_for('auth.confirm_email', token=token, _external=True)}  
+
+#     If you did not make this request then simply ignore the email and no changes will be made.
+#     """
+
+#     mail.send(msg)
+
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def register():
@@ -136,3 +150,17 @@ def reset_token(token):
         flash('Your Password Has been updated! You can log in with the registered credentials', 'success')
         return redirect(url_for('auth.login'))
     return render_template('reset_token.html', title = 'Reset Password', form = form)
+
+
+# @auth.route('/confirm_email/<token>', methods = ['GET', 'POST'])
+# def confirm_email(token):
+#     if current_user.is_authenticated:
+#         return redirect(url_for('main.user_profile', id = current_user.id))
+#     user = User.verify_reset_token(token)
+#     if user is None:
+#         flash('That is an invalid or expired token', 'warning')
+#         return redirect(url_for('auth.register'))
+
+#     flash('Try logging in with the registered credentials', 'success') 
+#     return redirect(url_for('auth.login'))
+  

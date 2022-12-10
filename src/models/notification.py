@@ -5,8 +5,8 @@ from flask_admin.contrib.sqla import ModelView
 from datetime import datetime
 
 
-class Message(UserMixin ,db.Model):
-    """Mesage model"""
+class Notification(UserMixin ,db.Model):
+    """Notification model"""
     ACCOUNT_DETAILS_CONFIRMED_ALERT = 0
     ACCOUNT_DETAILS_REJECTED_ALERT = 1
     ACCOUNT_CREDENTIALS_ALERT = 2
@@ -15,7 +15,7 @@ class Message(UserMixin ,db.Model):
     
    
 
-    __tablename__ = 'message'
+    __tablename__ = 'notification'
     id = db.Column(db.Integer, primary_key = True)
     buyer_id = db.Column(db.String(10))
     type = db.Column(db.SmallInteger, default = ACCOUNT_DETAILS_CONFIRMED_ALERT)
@@ -31,4 +31,4 @@ class Message(UserMixin ,db.Model):
     time_posted = db.Column(db.DateTime(timezone = True), default = func.now())
     
     def __repr__(self):
-        return '<Message %r>' % self.id
+        return '<Notification %r>' % self.id

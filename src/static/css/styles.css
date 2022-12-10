@@ -339,3 +339,9 @@ a.article-title:hover {
   border-radius: 10px;
   opacity: 0.9;
 }
+
+
+/* mpesa page */
+.phone-input{
+  width: 12em;
+}

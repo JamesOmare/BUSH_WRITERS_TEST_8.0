@@ -1,15 +1,14 @@
-body {
-    background-color: #f5eee7;
-    font-family: inherit;
-    font-weight: 300;
-}
-
-.container {
-    height: 100vh;
-}
 
 .card {
     border: none;
+}
+
+.mpesa{
+    width: 315px;
+}
+
+.g-3{
+    width: 46em;
 }
 
 .card-header {

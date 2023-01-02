@@ -1,12 +1,12 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <div class="jumbotron">
-    <h1 class="display-3">Welcome To Admin Portal</h1>
+    <h1 class="display-3">Welcome To The Admin Portal.</h1>
     <p class="lead">This is dashboard will help you manage user content or information.</p>
     <hr class="my-4">
-    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+    <p>One can edit or configure data within set limits on this page.</p>
     <p class="lead">
-      <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+      <a class="btn btn-primary btn-lg" href="{{url_for('main.viewpage')}}" role="button">Return To Marketplace</a>
     </p>
   </div>
 {% endblock %}

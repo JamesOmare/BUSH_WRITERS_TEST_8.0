@@ -1,5 +1,17 @@
 {% extends 'view_base.html' %}
 
+{% block navbar %}
+{% if notification == true %}
+    
+    <a class="nav-item nav-link rounded notification-anchor"  href="{{ url_for('main.chat', id=current_user.id) }}">
+    <button type="button" class="btn rounded position-relative notification-btn">
+        <i class="bi bi-bell"></i>
+        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+    </button>
+    </a> 
+   
+{% endif %}
+{% endblock navbar%}
 
 {% block stylesheets %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -19,21 +31,27 @@
         <div class="grid-body">
             <div class="row">
             <!-- BEGIN FILTERS -->
+            
+            {% block filters %}
+                
             <div class="col-md-3 filter">
-                <form action="">
-                    <h2 class="grid-title"><i class="fa fa-filter"></i> Filters</h2>
+                <form action="" method="POST">
+                    {{ filter_form.csrf_token }}
+                    <h2 class="grid-title"><i class="bi bi-search"></i> Filters</h2>
                     <hr>
+
+                  
                     
                     <!-- BEGIN FILTER BY CATEGORY -->
                     <h4>By category:</h4>
-                    <div class="checkbox">
-                    <label><input type="checkbox" class="icheck"> Academic Writing Account</label>
+                    <div class="">
+                    <label>{{ filter_form.article_ac(class="icheck") }} Article Account</label>
                     </div>
-                    <div class="checkbox">
-                    <label><input type="checkbox" class="icheck"> Article Account</label>
+                    <div class="">
+                    <label>{{ filter_form.academic_ac(class="icheck") }} Academic Writing Account</label>
                     </div>
-                    <div class="checkbox">
-                    <label><input type="checkbox" class="icheck"> Blogging Account</label>
+                    <div class="">
+                    <label>{{ filter_form.blogging_ac(class="icheck") }} Blogging Account</label>
                     </div>
                     <hr>
                     
@@ -41,51 +59,38 @@
                     
                     <div class="padding"></div>
                     
-                    <!-- BEGIN FILTER BY DATE -->
-                    <h4>By date:</h4>
-                    From
-                    <div class="input-group mb-3">
-                        <button type="button" class="btn btn-secondary">From</button>
-                        <input type="date" class="form-control" aria-label="Text input with segmented dropdown button">
-                    </div>
-                    
-                    To
-                    <div class="input-group mb-3">
-                        <button type="button" class="btn btn-secondary">To</button>
-                        <input type="date" class="form-control" aria-label="Text input with segmented dropdown button">
-                    </div>
-                    <hr>
-                    <!-- END FILTER BY DATE -->
-                    
-                    <div class="padding"></div>
                     
                     <!-- BEGIN FILTER BY PRICE -->
                     <h4>By price:</h4>
                     Between
                     <div class="input-group mb-3">
                         <span class="input-group-text">Ksh</span>
-                        <input type="number" placeholder="1000" min="1000" max="50000" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+                        {{ filter_form.price_range_a(class="form-control") }}
                     </div>
                     To
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                           <span class="input-group-text">Ksh</span>
                         </div>
-                        <input type="number" placeholder="1000" min="1000" max="50000" class="form-control" aria-label="Amount (to the nearest dollar)">
+                        {{ filter_form.price_range_b(class="form-control") }}
                       </div>
                   
                     <br>
                 <!-- END FILTER BY PRICE -->
-                <button type="button" class="btn btn-dark">Apply</button>
+                {{ filter_form.apply(class="btn btn-dark") }}
                 </form>
             </div>
+
+            {% endblock filters %}
             <!-- END FILTERS -->
+
+
             <!-- BEGIN RESULT -->
             <div class="col-md-9">
                 {% if logged_in_user %}
-                    <h2><i class="fa fa-file-o"></i> Welcome {{ logged_in_user.username | title }}</h2>
+                    <h2><i class="bi bi-house-fill"></i> Welcome {{ logged_in_user.username | title }}</h2>
                 {% else %}
-                    <h2><i class="fa fa-file-o"></i> Welcome </h2>
+                    <h2><i class="bi bi-house-fill"></i> Welcome </h2>
                 {% endif %}
                 
                 
@@ -106,7 +111,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form.keyword(class="form-control", placeholder='Enter keyword to search') }}
+                                {{ form.keyword(class="form-control", placeholder='Enter keyword to search account description') }}
                             {% endif %}
 
                             <span class="input-group-btn">
@@ -114,17 +119,17 @@
                             </span>
                         </div>
                         
-                        <!-- <input type="text" class="form-control" value=""> -->
                         
-                        <!-- <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
-                            <button class="btn btn-outline-secondary" type="button" id="button-addon2">Button</button>
-                          </div> -->
                     </div>
                 </form>
                 
                 <!-- END SEARCH INPUT -->
-                <p>Showing all results matching "web development"</p>
+                
+                {% block result %}
+                    
+                {% endblock result %}
+                    
+                
                 
                 <div class="padding"></div>
                 
@@ -132,26 +137,30 @@
                 <!-- BEGIN ORDER RESULT -->
                 <div class="dropdown col-sm-6">
                     <div class="btn-group">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Order By
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Name</a>
-                            <a class="dropdown-item" href="#">Date</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Rating</a>
-                        </div>
+                        
+                        {% block order_by %}
+                        <button class="btn btn-secondary" type="button">
+                            Order By
+                            </button>
+                            
+                            <form action="" method="POST">
+                                {{ order.csrf_token }}
+                                {{ order.hidden_tag() }}
+                                <div class="btn-group" role="group" >
+                                    {{ order.account_type(class = "custom-select mr-sm-2") }}
+                                    {{ order.submit(class = "btn btn-secondary mr-3 rounded") }}
+                                </div>
+                            </form>
+                        {% endblock order_by %}
+                                
+                        
+                        {% block search_back %}{% endblock search_back %}
                     </div>    
                 </div>
 
                 <!-- END ORDER RESULT -->
                 
-                <div class="col-md-6 text-right">
-                    <div class="btn-group">
-                    <button type="button" class="btn btn-default active"><i class="fa fa-list"></i></button>
-                    <button type="button" class="btn btn-default"><i class="fa fa-th"></i></button>
-                    </div>
-                </div>
+                
                 </div>
                 
                 <!-- BEGIN TABLE RESULT -->
@@ -318,38 +327,29 @@
 <div class="footer-container">
   <footer class="py-5">
     <div class="row">
+
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Sections</h5>
+        <h5 class="text-white">Get In Touch</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
-        </ul>
+            <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-geo-alt-fill mr-2"></i>Juja</p></li>
+            <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254717010172</p></li>
+            <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-envelope-fill mr-2"></i>bushwriters@gmail.com</p></li>
+            <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254717010172</p></li>
+            <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-headset mr-2"></i>Customer Support, Sun - Fri, 7AM-10PM</p></li>
+          </ul>
       </div>
 
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Quick Links</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.viewpage') }}" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.guide') }}" class="nav-link p-0 footer-color">Guide</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.seller') }}" class="nav-link p-0 footer-color">Become A Seller</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.contact_us') }}" class="nav-link p-0 footer-color">Contact Us</a></li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
-        </ul>
-      </div>
+      
 
       <div class="col-md-5 offset-md-1 mb-3">
         <form>

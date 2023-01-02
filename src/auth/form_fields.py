@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm, RecaptchaField
-from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, FileField, TextAreaField, SelectField, DateField, IntegerField, MultipleFileField, HiddenField, TelField, HiddenField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, FileField, TextAreaField, SelectField, DateField, IntegerField, MultipleFileField, HiddenField, TelField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email, DataRequired, Optional, NumberRange
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from datetime import datetime, date
@@ -35,7 +35,7 @@ class RegistrationForm(FlaskForm):
 
     accept_tos = BooleanField('I accept the TOS', [DataRequired(message='You need to check the box to continue')])
 
-    recaptcha = RecaptchaField()
+    # recaptcha = RecaptchaField()
 
     submit = SubmitField('Create')
 
@@ -69,21 +69,24 @@ class Seller_Profile_Form(FlaskForm):
                 validators=[InputRequired(message='Account name required'),
                 Length(min=3, max=50, message='Account name must be between 3 and 50 characters')])
 
-    account_brand = StringField('Account Brand', 
+    account_brand = StringField('Account Brand i.e medium', 
                 validators=[InputRequired(message='Account brand name required i.e medium'),
                 Length(min=2, max=50, message='Account name must be between 2 and 50 characters')])
 
-    account_type = SelectField('Account Category', choices=[('ARTICLE_ACCOUNT', 'Article Account'), ('ACADEMIC_WRITING_ACCOUNT', 'Academic Writing Account'), ('BLOGGING_ACCOUNT', 'Blogging Account')])
+    account_type = SelectField('Account Category',
+                choices=[('ARTICLE_ACCOUNT', 'Article Account'), ('ACADEMIC_WRITING_ACCOUNT', 'Academic Writing Account'), ('BLOGGING_ACCOUNT', 'Blogging Account')])
+
+    account_status = SelectField('Account Condition', choices=[('No suspensions or warnings'), ('Account Warning'), ('Account suspended once'), ("Account Suspended Multiple Times")])
 
     account_description = TextAreaField('Account Description', [Optional(), Length(max=200)])
 
     account_creation_date = DateField('Date (DD-MM-YYYY)', default=date.today(),  validators=[DataRequired("Please enter the account creation Date."), InputRequired()])
 
-    images = MultipleFileField('Upload Account Images ie Screenshots here', [Optional()], render_kw={'multiple': True})
+    images = MultipleFileField('Upload', [Optional()], render_kw={'multiple': True})
     # profile = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     
 
-    account_value = IntegerField('Account Selling Price', validators=[InputRequired(message='Account price valuation required'), NumberRange(min=1000, max = 20000)], default = 1000)
+    account_value = IntegerField('Account Selling Price', validators=[InputRequired(message='Account price valuation required'), NumberRange(min=1000, max = 200000)], default = 1000)
 
     submit = SubmitField('Update')
 
@@ -141,28 +144,16 @@ class AdminForm(FlaskForm):
                 Length(min=3, max=25, message='The password must be between 3 and 25 characters')])
     buyer_id = IntegerField('Buyer ID', validators=[InputRequired(message='Buyer ID required'), NumberRange(min=1)])
     account_id = IntegerField('Account ID', validators=[InputRequired(message='Account ID required'), NumberRange(min=1)])
-    # type = SelectField('Account Category', choices=[('PURCHASE_INTENT', 'Purchase Intent'), ('ACCOUNT_PURCHASE_VERIFICATION', 'Account Purchase Verification'), ('SUCCESSFUL_PURCHASE', 'Successful Purchase'), ('FAILED_PURCHASE', 'Failed Purchase')])
-    # intent_message = StringField('Enter Intent Message')
-    # purchase_verification_message = StringField('Enter Purchase Verification Message')
-    # successful_purchase = StringField('Enter Successful Account Purchase Message')
-    # failed_purchase = StringField('Enter Failed Account Purchase Message')
     submit = SubmitField('Send')
 
 class Complaint(FlaskForm):
-    buyer_phone_number = IntegerField('Enter your phone number', validators=[InputRequired(message='Phone number required required')])
-    seller_phone_number = IntegerField('Enter seller\'s phone number', validators=[InputRequired(message='Phone number required required')])
     reason = SelectField('Select Reason', choices=[('Account Advertised was misleading'), ('Account credentials are incorrect'), ('Account is suspended'), ("Other reasons(can expound further below)")])
     seller_id = HiddenField()
+    account_id = HiddenField()
     extended_reason = TextAreaField('Further Description on the account problem(Optional)', [Optional(), Length(max=250)])
     submit = SubmitField("Reject")
 
 class Seller_Account_Details(FlaskForm):
-    account_name = StringField('Account Name', 
-                validators=[InputRequired(message='Account Name required'),
-                Length(min=3, max=25, message='Account Name must be between 3 and 25 characters')])
-    account_type = StringField('Account Type i.e medium', 
-                validators=[InputRequired(message='Account Type required'),
-                Length(min=3, max=25, message='Account Type must be between 3 and 25 characters')])
     account_email = EmailField('Account Login Email', validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
     account_url = StringField('Account Url', 
                 validators=[InputRequired(message='Account Url required'),
@@ -172,6 +163,17 @@ class Seller_Account_Details(FlaskForm):
     buyer_id = HiddenField()
     account_id = HiddenField()
     submit = SubmitField("Submit")
+
+
+class Seller_Complete_Account_Details(FlaskForm):
+    account_cerificate = FileField(validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), FileRequired()])
+    account_license = FileField(validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), FileRequired()])
+    other = MultipleFileField('Upload other relevant documents if necessary', validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), Optional()], render_kw={'multiple': True})
+    account_owner_number = TelField('Phone', validators=[DataRequired()])
+    buyer_id = HiddenField()
+    account_id = HiddenField()
+    submit = SubmitField("Send")
+
 
 
 class Payment_Method(FlaskForm):
@@ -198,14 +200,12 @@ class Search(FlaskForm):
     search = SubmitField()
 
 class FilteredSearch(FlaskForm):
-   article_ac =  BooleanField('Article Account')
-   academic_ac = BooleanField('Academic Writing Account')
-   blogging_ac = BooleanField('Blogging Account')
-   date_from = DateField('From Date (DD-MM-YYYY)', default=date.today())
-   date_to = DateField('To Date (DD-MM-YYYY)', default=date.today())
-   price_range_a = IntegerField('Between Price: ', validators=[NumberRange(min=1000, max=50000)])
-   price_range_b = IntegerField('To Price: ', validators=[NumberRange(min=1000, max=50000)])
-   search = SubmitField()
+   article_ac =  BooleanField('Article Account', default = False)
+   academic_ac = BooleanField('Academic Writing Account', default = False)
+   blogging_ac = BooleanField('Blogging Account', default = False)
+   price_range_a = IntegerField('Between Price: ', validators=[NumberRange(min=1000, max=50000)], default = 1000)
+   price_range_b = IntegerField('To Price: ', validators=[NumberRange(min=1000, max=50000)], default = 50000)
+   apply = SubmitField("Apply")
 
    def validate_account_creation_date(form, date_from, date_to):
         if date_from.data or date_to.data > date.today():
@@ -215,3 +215,43 @@ class Mpesa_Confirm(FlaskForm):
     phone_number = StringField(validators=[InputRequired(message='Phone Number required'),
                 Length(min=10, max=15, message='Phone number must be at least 10 characters')])
     pay = SubmitField('Make Payment')
+
+class Contact_Us(FlaskForm):
+    sender_name = StringField('Name', 
+                validators=[InputRequired(message='Firstname required'),
+                Length(min=3, max=50, message='First name must be between 3 and 50 characters')])
+    sender_email =     EmailField('Email', 
+                validators=[InputRequired(message='Enter a valid email address(i.e user121@email.com)'), Email()])
+    subject = StringField('Subject', 
+                validators=[InputRequired(message='subject required'),
+                Length(min=3, max=50, message='subject name must be between 3 and 50 characters')])
+    message =   TextAreaField('Message', 
+                validators=[InputRequired(message='message required'),
+                Length(min=3, max=1000, message='Message text must be between 3 and 1000 characters')])
+    submit = SubmitField("Send Message")
+
+
+class Order_By(FlaskForm):
+    account_type = SelectField('Order By', choices=[('highest_price', 'Price(Highest)'), ('lowest_price', 'Price(Lowest)'), ('highest_ratings', 'Rating(Highest)'), ('lowest_ratings', 'Rating(Lowest)'), ('date_posted_old', 'Date Posted(Old)'), ('date_posted_new', 'Date Posted(New)')])
+    submit = SubmitField("Go")
+
+class Accept_Account(FlaskForm):
+    seller_id = HiddenField()
+    account_id = HiddenField()
+    accept = SubmitField("Confirm Credentials")
+
+class Upload_Images(FlaskForm):
+    # photo = MultipleFileField('Upload Image(s)', validators=[FileAllowed(['jpg', 'png', 'jpeg' ], 'Only images are allowed!'), Length(max=3, message='File uploads is limited to a maximum of 3 files.'), FileRequired()])
+    photo = FileField(validators=[FileAllowed(['jpg', 'png', 'jpeg' ], 'Only images are allowed'), FileRequired()])
+    account_id = HiddenField()
+    upload = SubmitField('Upload')
+
+class Full_Purchase(FlaskForm):
+    seller_id = HiddenField()
+    account_id = HiddenField()
+    completed = SubmitField("Complete Purchase")
+
+class Partial_Purchase(FlaskForm):
+    seller_id = HiddenField()
+    account_id = HiddenField()
+    additional_info = SubmitField("Request Additional Account Credentials")

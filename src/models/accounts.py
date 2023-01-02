@@ -32,6 +32,8 @@ class Account(db.Model):
     time_posted = db.Column(db.DateTime (timezone = True), default = func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'))
     images = db.relationship('Image', backref = 'account', passive_deletes = True, lazy='dynamic' )
+    notifications = db.relationship('Notification', backref = 'account', passive_deletes = True, lazy='dynamic')
+    complaints = db.relationship('Complaints', backref = 'account', passive_deletes = True, lazy='dynamic')
 
 
     def __repr__(self):

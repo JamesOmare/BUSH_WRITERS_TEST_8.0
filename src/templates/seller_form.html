@@ -1,15 +1,19 @@
 {% extends "base.html" %}
 
 {% block stylesheets %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" >
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" >
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/multi_form.css') }}" >
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/card-styles.css') }}" >
 
 {% endblock stylesheets %}
     
 {% block content %}
-<div>
-    <h1>Multi-Step Form </h1>
+<h2>Create An Account Ad</h2>
+<hr>
+<br>
+<div class="content-section ">
+    <h1 class="text-dark">Account Details Form </h1>
     <div id="multi-step-form-container">
         <!-- Form Steps / Progress Bar -->
         <ul class="form-stepper form-stepper-horizontal text-center mx-auto pl-0">
@@ -19,7 +23,7 @@
                     <span class="form-stepper-circle">
                         <span>1</span>
                     </span>
-                    <div class="label">Account Basic Details</div>
+                    <div class="label text-white">Account Basic Details</div>
                 </a>
             </li>
             <!-- Step 2 -->
@@ -28,7 +32,7 @@
                     <span class="form-stepper-circle text-muted">
                         <span>2</span>
                     </span>
-                    <div class="label text-muted">Seller Profile</div>
+                    <div class="label text-white">Seller Profile</div>
                 </a>
             </li>
             <!-- Step 3 -->
@@ -37,7 +41,7 @@
                     <span class="form-stepper-circle text-muted">
                         <span>3</span>
                     </span>
-                    <div class="label text-muted">Account Description</div>
+                    <div class="label text-white">Account Description</div>
                 </a>
             </li>
         </ul>
@@ -45,16 +49,18 @@
 
         <!-- Step Wise Form Content -->
         <form enctype="multipart/form-data" action="{{ url_for('main.seller') }}" method="POST">
+            {{ form.csrf_token }}
             {{ form.hidden_tag() }}
             <!-- Step 1 Content -->
             <section id="step-1" class="form-step">
-                <h2 class="font-normal">Account Basic Details</h2>
+                <h2 class="font-normal text-white">Account Basic Details</h2>
+                <hr class="text-white">
                 <!-- Step 1 input fields -->
                 <div class="mt-3">
 
                     <!-- Account Name -->
                     <div class="form-group">
-                        {{ form.account_name.label(class="form-control-label") }}
+                        {{ form.account_name.label(class="form-control-label text-white") }}
                         {% if form.account_name.errors %}
                             {{ form.account_name(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
@@ -70,7 +76,7 @@
 
                     <!-- Account Brand -->
                     <div class="form-group">
-                        {{ form.account_brand.label(class="form-control-label") }}
+                        {{ form.account_brand.label(class="form-control-label text-white") }}
                         {% if form.account_brand.errors %}
                             {{ form.account_brand(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
@@ -86,7 +92,7 @@
                     
                     <!-- Account Type section -->
                     <div class="form-group">
-                        {{ form.account_type.label(class="form-control-label") }}
+                        {{ form.account_type.label(class="form-control-label text-white") }}
                         {% if form.account_type.errors %}
                             {{ form.account_type(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
@@ -102,7 +108,7 @@
 
                     <!-- Account Creation Date -->
                     <div class="form-group">
-                        {{ form.account_creation_date.label(class="form-control-label") }}
+                        {{ form.account_creation_date.label(class="form-control-label text-white") }}
                         {% if form.account_creation_date.errors %}
                             {{ form.account_creation_date(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
@@ -123,13 +129,14 @@
 
             <!-- Step 2 Content, default hidden on page load. -->
             <section id="step-2" class="form-step d-none">
-                <h2 class="font-normal">Seller Profile</h2>
+                <h2 class="font-normal text-white">Seller Profile</h2>
+                <hr class="text-white">
                 <!-- Step 2 input fields -->
                 <div class="mt-3">
 
                     <!-- Account Price -->
                     <div class="form-group">
-                        {{ form.account_value.label(class="form-control-label") }}
+                        {{ form.account_value.label(class="form-control-label text-white") }}
                         {% if form.account_value.errors %}
                             {{ form.account_value(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
@@ -142,6 +149,24 @@
                         {% endif %}
                     </div>
                     <br/>
+
+                    <!-- Account Status section -->
+                    <div class="form-group">
+                        {{ form.account_status.label(class="form-control-label") }}<b style="color: #dc3545;">*</b>
+                        {% if form.account_status.errors %}
+                            {{ form.account_status(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.account_status.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.account_status(class="form-control form-control-lg") }}
+                            <span class="invalid-feedback">This field is required</span>
+                        {% endif %}
+                      </div>
+                      <br/>
+                      
                 </div>
                 <div class="mt-3">
                     <button class="button btn-navigate-form-step" type="button" step_number="1">Prev</button>
@@ -150,12 +175,13 @@
             </section>
             <!-- Step 3 Content, default hidden on page load. -->
             <section id="step-3" class="form-step d-none">
-                <h2 class="font-normal">Account Description</h2>
+                <h2 class="font-normal text-white">Account Description</h2>
+                <hr class="text-white">
                 <!-- Step 3 input fields -->
 
                 <!-- Account Description -->
                 <div class="form-group">
-                    {{ form.account_description.label(class="form-control-label") }}
+                    {{ form.account_description.label(class="form-control-label text-white") }}
                     {% if form.account_description.errors %}
                         {{ form.account_description(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -170,7 +196,7 @@
 
                 <!-- Account Images upload -->
                 <div class="form-group">
-                    {{ form.images.label(class="form-control-label") }}
+                    {{ form.images.label(class="form-control-label text-white") }}
                     {% if form.images.errors %}
                         {{ form.images(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -186,62 +212,130 @@
                 <div class="mt-3">
                     <button class="button btn-navigate-form-step" type="button" step_number="2">Prev</button>
                     
-                    <div class="form-group">
-                        {{ form.submit(class="btn btn-outline-info") }}
-                    </div>
+                    {{ form.submit(class="button btn-navigate-form-step") }}
+        
+                    
                 </div>
+                
             </section>
         </form>
     </div>
 </div>
 {% endblock content %}
 
+{% block sidebar %}
+  <div class="col-md-4 sidebar">
+    <div class="content-section">
+      <!-- Sell Account Details -->
+      <h3 class="side-title">Sell Account</h3>
+      <p class='text-muted side-text'>Place an ad on an account you want to sell.
+        <!--Widget Start-->
+        <div class="card-body card-sidebar color1">
+          <div class="float-left">
+            <p>Account Ad</p>
+              <h3>
+                  <span class="currency">Sell</span>
+              </h3>
+            
+          </div>
+          <div class="float-right">
+            <i class="bi bi-cash-coin"></i>
+          </div>
+        </div>
+        <!--Widget End-->
+      </p>
+      <div class="d-grid gap-2 col-11 mx-auto">
+        <a href="{{ url_for('main.seller') }}" role="button" class="btn btn-warning">Sell Account</a>
+      </div>
+      <br/>
+      <hr class="text-white">
+
+      <h3 class="side-title">Buy Account</h3>
+      <p class='text-muted side-text'>View marketplace to explore listings on accounts for sale.
+       <!--Widget Start-->
+       <div class="card-body card-sidebar color2">
+        <div class="float-left">
+          <p>Visit</p>
+            <h3>
+                <span class="currency">Listings</span>
+            </h3>
+          
+        </div>
+        <div class="float-right">
+          <i class="bi bi-cart4"></i>
+        </div>
+      </div>
+      <!--Widget End-->
+      </p>
+      <div class="d-grid gap-2 col-11 mx-auto">
+        <a href="{{ url_for('main.viewpage') }}" role="button" class="btn btn-warning">Visit Marketplace</a>
+      </div>
+      <br/>
+      <hr class="text-white">
+
+
+      <h3 class="side-title">Customer Support</h3>
+      <p class='text-muted side-text'>Our Support center is always one call away.
+       <!--Widget Start-->
+       <div class="card-body card-sidebar color4">
+        <div class="float-left">
+          <p>Client</p>
+            <h3>
+                <span class="currency">Support</span>
+            </h3>
+        </div>
+        <div class="float-right">
+          <i class="bi bi-headset"></i>
+        </div>
+      </div>
+      <!--Widget End-->
+      </p>
+     
+
+    </div>
+  </div>
+  <br/>
+  
+{% endblock sidebar %}
+
 {% block footer %}
 <div class="border-top pt-3"></div>
-<div class="container footer-container">
+<div class="footer-container">
   <footer class="py-5">
     <div class="row">
+
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Get In Touch</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-geo-alt-fill mr-2"></i>Juja</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254743635629</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-envelope-fill mr-2"></i>bushwriters@gmail.com</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254743635629</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-headset mr-2"></i>Customer Support, Mon - Sat, 7AM-10PM</p></li>
         </ul>
       </div>
 
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Quick Links</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.viewpage') }}" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.guide') }}" class="nav-link p-0 footer-color">Guide</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.seller') }}" class="nav-link p-0 footer-color">Become A Seller</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.contact_us') }}" class="nav-link p-0 footer-color">Contact Us</a></li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
-        </ul>
-      </div>
+      
 
       <div class="col-md-5 offset-md-1 mb-3">
         <form>
           <h5 class="text-white">Subscribe to our newsletter</h5>
           <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
-          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-            <label for="newsletter1" class="visually-hidden">Email address</label>
-            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
-            <button class="btn btn-primary" type="button">Subscribe</button>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Email Address" aria-label="Recipient's email input" aria-describedby="button-addon4">
+            <div class="input-group-append" id="button-addon4">
+              <button class="btn btn-primary" type="button">Subscribe</button>
+            </div>
           </div>
         </form>
       </div>

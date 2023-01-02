@@ -13,6 +13,8 @@ class Confirmation(UserMixin ,db.Model):
     buyer_email = db.Column(db.String(120))
     seller_id = db.Column(db.String(10))
     account_id = db.Column(db.String(10))
+    is_rejected = db.Column(db.Boolean, default = False)
+    is_accepted = db.Column(db.Boolean, default = False)
     time_posted = db.Column(db.DateTime(timezone = True), default = func.now())
    
     def __repr__(self):

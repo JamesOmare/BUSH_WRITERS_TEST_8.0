@@ -313,7 +313,7 @@ a.article-title:hover {
 }
 
 .footer-color{
-  color: #b9eb24;
+  color: #b9eb24 !important;
 }
 
 .sidebar{
@@ -341,7 +341,22 @@ a.article-title:hover {
 }
 
 
+.yellow-text{
+  color: #cff509;
+}
+
 /* mpesa page */
 .phone-input{
   width: 12em;
+}
+
+/* notofication btn */
+.notification-anchor{
+  height: 40px;
+  padding-left: 1px !important;
+  padding-top: 4px !important;
+}
+
+.notification-btn{
+  background-color: #e59319 !important;
 }

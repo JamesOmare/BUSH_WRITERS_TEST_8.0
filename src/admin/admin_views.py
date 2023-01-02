@@ -8,26 +8,28 @@ from wtforms.fields import SelectField, PasswordField, StringField
 from flask_admin import Admin, BaseView, expose, Admin, AdminIndexView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
-from flask import g, url_for, flash, request, render_template
+from flask import g, url_for, flash, request, render_template, redirect, abort, session
 from flask_admin.actions import action
+from flask_login import current_user
 from sqlalchemy.sql import func
 from ..auth.form_fields import AdminForm, Payment_Status
 from ..models.notification import Notification
 from ..models.complaints import Complaints
+from ..models.subscription_list import Subscription
+from ..models.payment import Payment
+from sqlalchemy import desc
 
-# class AdminAuthentication(object):
-#     def is_accessible(self):
-#         return g.user.is_authenticated and g.user.is_admin()
-
-# class BaseModelView(AdminAuthentication, ModelView):
-#     pass
+class AdminAuthentication(object):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin()
 
 
-
-# class IndexView(AdminIndexView):
-#     @expose('/')
-#     def index(self):
-#         return self.render('admin/index.html')
+class SecureModelView(ModelView):
+    def is_accessible(self):
+        if current_user.admin and current_user.is_authenticated:
+            return True
+        else:
+            abort(403)
 
 class OnProgressView(ModelView):
     can_delete = False
@@ -238,125 +240,44 @@ class DisputedView(ModelView):
         return self.render('admin/complaint_claims.html', claims = complaints)
 
 
-# class UserView(ModelView):
-#     @action('approve', 'Approve', 'Are you sure you want to approve selected users?')
-#     def action_approve(self, ids):
-#         try:
-#             query = User.query.filter(User.id.in_(ids))
 
-#             count = 0
-#             for user in query.all():
-#                 if user.approve():
-#                     count += 1
-
-#             flash(ngettext('User was successfully approved.',
-#                            '%(count)s users were successfully approved.',
-#                            count,
-#                            count=count))
-#         except Exception as ex:
-#             if not self.handle_view_exception(ex):
-#                 raise
-
-#             flash(gettext('Failed to approve users. %(error)s', error=str(ex)), 'error')
-
-# class MyView(BaseView):
+# class NotificationView(BaseView):
 #     @expose('/')
-#     def index(self):
-#         return 'Hello World!'
+#     def custom(self):
+#         return self.render('admin/custom.html')
 
-class NotificationView(BaseView):
-    @expose('/')
-    def custom(self):
-        return self.render('admin/custom.html')
+#     @expose('/second_page')
+#     # @login_required
+#     # @has_role('admin')
+#     def second_page(self):
+#         return self.render('admin/notification.html')
 
-    @expose('/second_page')
-    # @login_required
-    # @has_role('admin')
-    def second_page(self):
-        return self.render('admin/notification.html')
+# class FormView(BaseView):
+#     @expose('/', methods=('GET', 'POST'))
+#     def form(self):
+#         form = AdminForm()
+#         if request.method == 'POST':
+#             if form.validate_on_submit() == False:
+#                 flash('All fields are required.', 'error')
+#                 return self.render('admin/form.html', form=form)
+#             else:
+#                 login_email = form.ac_login_email.data
+#                 login_pass = form.ac_login_pass.data
+#                 buyer_id = form.buyer_id.data
+#                 account_id = form.account_id.data
+#                 new_msg = Notification(
+#                     login_password = login_pass,
+#                     login_email = login_email,
+#                     type = 2,
+#                     buyer_id = buyer_id,
+#                     account_id = account_id
+#                 )
 
-class FormView(BaseView):
-    @expose('/', methods=('GET', 'POST'))
-    def form(self):
-        form = AdminForm()
-        if request.method == 'POST':
-            if form.validate_on_submit() == False:
-                flash('All fields are required.', 'error')
-                return self.render('admin/form.html', form=form)
-            else:
-                login_email = form.ac_login_email.data
-                login_pass = form.ac_login_pass.data
-                buyer_id = form.buyer_id.data
-                account_id = form.account_id.data
-                new_msg = Notification(
-                    login_password = login_pass,
-                    login_email = login_email,
-                    type = 2,
-                    buyer_id = buyer_id,
-                    account_id = account_id
-                )
-
-                db.session.add(new_msg)
-                db.session.commit()
-                flash('Notification sent succcessfully to recipient', 'success')
-                return self.render('admin/form.html', form = form)
-        return self.render('admin/form.html', form = form)
-
-            # elif form.type == 0:
-            #     buyer_id = form.user_id.data
-            #     account_id = form.account_id.data
-            #     alert_message = form.intent_message.data
-            #     purchase_intent_msg = Message(
-            #         buyer_id = buyer_id,
-            #         account_id = account_id,
-            #         intent_message = alert_message
-            #     )
-            #     db.session.add(purchase_intent_msg)
-            #     db.session.commit()
-            #     flash('Message sent succcessfully to recipient', 'success')
-            #     return self.render('admin/form.html', form = form)
-
-            # elif form.type == 1:
-            #     buyer_id = form.user_id.data
-            #     account_id = form.account_id.data
-            #     alert_message = form.purchase_verification_message.data
-            #     purchase_verification_msg = Message(
-            #         buyer_id = buyer_id,
-            #         account_id = account_id,
-            #         purchase_verification_message = alert_message
-            #     )
-            #     db.session.add(purchase_verification_msg)
-            #     db.session.commit()
-            #     flash('Message sent succcessfully to recipient', 'success')
-            #     return self.render('admin/form.html', form = form)
-
-            # elif form.type == 2:
-            #     buyer_id = form.user_id.data
-            #     account_id = form.account_id.data
-            #     alert_message = form.successful_purchase.data
-            #     successful_purchase_msg = Message(
-            #         buyer_id = buyer_id,
-            #         account_id = account_id,
-            #         successful_purchase = alert_message
-            #     )
-            #     db.session.add(successful_purchase_msg)
-            #     db.session.commit()
-            #     flash('Message sent succcessfully to recipient', 'success')
-            #     return self.render('admin/form.html', form = form)
-
-            # elif form.type == 3:
-            #     buyer_id = form.user_id.data
-            #     account_id = form.account_id.data
-            #     alert_message = form.failed_purchase.data
-            #     failed_purchase_msg = Message(
-            #         buyer_id = buyer_id,
-            #         account_id = account_id,
-            #         failed_purchase = alert_message
-            #     )
-            #     db.session.add(failed_purchase_msg)
-            #     db.session.commit()
-            #     flash('Message sent succcessfully to recipient', 'success')
-            #     return self.render('admin/form.html', form = form)
+#                 db.session.add(new_msg)
+#                 db.session.commit()
+#                 flash('Notification sent succcessfully to recipient', 'success')
+#                 return self.render('admin/form.html', form = form)
+#         return self.render('admin/form.html', form = form)
 
             
 
@@ -388,10 +309,10 @@ class AccountModelView(ModelView):
     
 
 class UserModelView(ModelView):
-    column_list = ['id', 'username', 'email', 'phone_number', 'profile_photo', 'active', 'date_created']
+    column_list = ['id', 'username', 'email', 'phone_number', 'profile_photo', 'active', 'date_created', 'admin']
     column_searchable_list = ['id', 'username', 'email', 'phone_number', 'profile_photo', 'active', 'date_created', 'account.brand', 'account.price']
     column_filters = ['active',User.id, User.phone_number, User.date_created, Account.account_name, Account.price, Account.brand, Account.brand, Account.status, Account.account_id, Account.account_type, 'date_created']
-    form_columns = ['id', 'username', 'admin', 'email', 'phone_number', 'password', 'profile_photo', 'active', 'date_created']
+    form_columns = ['id', 'username', 'admin', 'email', 'phone_number', 'profile_photo', 'active', 'date_created']
     form_extra_fields = {
     'password': PasswordField('New password'),
     }
@@ -405,10 +326,8 @@ def on_model_change(self, form, model, is_created):
 
 class Confirmation_Message(BaseView):
     @expose('/', methods=('GET', 'POST'))
-    # @login_required
-    # @has_role('admin')
     def notification_page(self):
-        confirmation = Confirmation.query.all()
+        confirmation = Confirmation.query.order_by(desc(Confirmation.time_posted)).all()
         form = Payment_Status()
         if request.method == 'POST':
             if not confirmation:
@@ -423,19 +342,19 @@ class Confirmation_Message(BaseView):
                 buyer_id = form.buyer_id.data
                 seller_id = form.seller_id.data
                 account = Account.query.filter_by(account_id = account_id).first()
+                confirmation_msg = Confirmation.query.filter_by(account_id = account_id).first()
                 if confirmed:
-                    print('Account status was: ', account.status, 'Account id: ', account_id)
+                    if confirmation_msg.is_accepted:
+                        flash("The confirmation message has already been verified by the admin", "warning")
+                    
+                    elif confirmation_msg.is_rejected:
+                        flash("The confirmation message has already been rejected by the admin", "warning")
+
+                    # Update account status to verification stage
                     account.status = 2
-                    # db.session.refresh(account)
-                    # db.session.merge(account)
                     db.session.commit()
-                    # print('Account session: ' , Account.query.session.connection().engine)
-                    # print('db session: ', db.session.connection().engine)
-                    # print(' ', Account.query.session == db.session)
-                    # print(' ', Account.query.session.connection() == db.session.connection())
-                    print('Account status now is: ',account.status)
-                    # print(Account.query.session.connection().engine.url)
-                    # print(db.session.connection().engine.url)
+                   
+                   # display notification to user profile
                     alert_message = True
                     alert_type = 0
                     alert = Notification(
@@ -448,13 +367,44 @@ class Confirmation_Message(BaseView):
 
                     db.session.add(alert)
                     db.session.commit()
+
+                    # change message notification status in admin side
+                    confirmation_msg.is_accepted = True
+                    db.session.commit()
+
+
                     flash('Status has been updated successfully', 'success')
                     return self.render('admin/on_progress.html', form = form, confirmations = confirmation)
+
                 elif rejected:
-                    print('Account Status is', account.status)
+                    if confirmation_msg.is_rejected:
+                        flash("The confirmation message has already been rejected by the admin", "warninig")
+                    
+                    elif confirmation_msg.is_accepted:
+                        flash("The confirmation message has already been accepted by the admin", "warninig")
+                    # display rejection notification to user profile
+                    alert_message = True
+                    alert_type = 1
+                    alert = Notification(
+                        buyer_id = buyer_id,
+                        seller_id = seller_id,
+                        account_id = account_id,
+                        purchase_verification_message = alert_message,
+                        type = alert_type
+                    )
+
+                    db.session.add(alert)
+                    db.session.commit()
+
+                    # change message notification status in admin side
+                    confirmation_msg.is_rejected = True
+                    db.session.commit()
+
                     flash('The buyer will be notified of the purchase status', 'danger')
                     return self.render('admin/on_progress.html', form = form, confirmations = confirmation)
         return self.render('admin/on_progress.html', confirmations = confirmation, form = form)
+
+
 
 class Rejected_Accounts(BaseView):
     @expose('/')
@@ -467,21 +417,21 @@ class Rejected_Accounts(BaseView):
         return self.render('admin/complaint_claims.html', claims = complaints)
 
 
-class NotificationsView(BaseView):
-    @expose('/')
-    def index(self):
-        return self.render('admin/notify.html')
+# class NotificationsView(BaseView):
+#     @expose('/')
+#     def index(self):
+#         return self.render('admin/notify.html')
 
 
 admin.add_view(UserModelView(User, db.session))
 admin.add_view(AccountModelView(Account, db.session))
 path = op.join(op.dirname(__file__), '../static')
 admin.add_view(FileAdmin(path, '/static/', name='Static Files'))
-# admin.add_view(NotificationView(name='Custom'))
-# admin.add_view(FormView(name='Forms'))
 admin.add_view(OnProgressView(Account, db.session, name='On Progress', endpoint="on_progress"))
 admin.add_view(VerificationView(Account, db.session, name='Verification Pending', endpoint="pending_verification"))
 admin.add_view(SucessView(Account, db.session, name='Successful', endpoint="success"))
 admin.add_view(DisputedView(Account, db.session, name='Disputed', endpoint="disputed"))
 admin.add_view(Confirmation_Message(name = 'Confirmation Messeges', category="Incoming Messages"))
 admin.add_view(Rejected_Accounts(name = 'Rejection Messeges', category="Incoming Messages"))
+admin.add_view(SecureModelView(Subscription, db.session, name = "Email Subscription", endpoint="subscription_list"))
+admin.add_view(SecureModelView(Payment, db.session, name = "Payment List", endpoint="payment_list"))

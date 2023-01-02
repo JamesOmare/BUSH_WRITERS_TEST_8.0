@@ -13,8 +13,6 @@ class Account_Credentials(UserMixin ,db.Model):
     seller_id = db.Column(db.Integer)
     buyer_id = db.Column(db.Integer)
     account_id = db.Column(db.Integer)
-    account_name = db.Column(db.String(150))
-    account_type = db.Column(db.String(50))
     account_email = db.Column(db.String(100))
     account_url = db.Column(db.String(250))
     account_passphrase = db.Column(db.String(250))

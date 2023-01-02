@@ -120,50 +120,42 @@
 
 {% block footer %}
 <div class="border-top pt-3"></div>
-<div class="container footer-container">
+<div class="footer-container">
   <footer class="py-5">
     <div class="row">
+
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Get In Touch</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-geo-alt-fill mr-2"></i>Juja</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-envelope-fill mr-2"></i>bushwriters@gmail.com</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-headset mr-2"></i>Customer Support, Sun - Fri, 7AM-10PM</p></li>
         </ul>
       </div>
 
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Quick Links</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.viewpage') }}" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.guide') }}" class="nav-link p-0 footer-color">Guide</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.seller') }}" class="nav-link p-0 footer-color">Become A Seller</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.contact_us') }}" class="nav-link p-0 footer-color">Contact Us</a></li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
-        </ul>
-      </div>
+      
 
       <div class="col-md-5 offset-md-1 mb-3">
         <form>
           <h5 class="text-white">Subscribe to our newsletter</h5>
           <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
-          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-            <label for="newsletter1" class="visually-hidden">Email address</label>
-            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
-            <button class="btn btn-primary" type="button">Subscribe</button>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Email Address" aria-label="Recipient's email input" aria-describedby="button-addon4">
+            <div class="input-group-append" id="button-addon4">
+              <button class="btn btn-primary" type="button">Subscribe</button>
+            </div>
           </div>
         </form>
       </div>

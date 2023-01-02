@@ -19,7 +19,7 @@
 
       {% for item in buyer_msg %}
             {% if item.type == 0 %}
-              <div class="fm-content">
+              <div class="fm-content accepted" id="accepted">
                 <form>
                   <fieldset disabled>
                       <div class="mb-3 title-time-display">
@@ -28,22 +28,43 @@
                       </div>
                       <div class="mb-3">
                         <div class="card-body">
-                          <h5 class="card-title text-white">Purchase Intent Alert</h5>
+                          <h5 class="card-title yellow-text">Purchase Intent Alert</h5>
+                          <br>
                           <p class="card-text text-white">
                             We have received the confirmation message sent and have verified it. Please wait while we contact the seller
-                            so as to send you the account credentials for you to acertain validity of the account.
-                          </p>                
+                            so as to send you the account credentials to acertain validity of the account.
+
+                          </p>
+                          
+                          <br>
+
+                          <h5 class="card-title yellow-text mb-2">Purchased Account Details:</h5>
+                          <table class="table table-dark table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col">Account Name</th>
+                                <th scope="col">Account Type</th>
+                                <th scope="col">Account Brand</th>
+                                <th scope="col">Account Price</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{item.account.account_name}}</td>
+                                <td>{{item.account.account_type.value | replace("_", "  ") | title}}</td>
+                                <td>{{item.account.brand}}</td>
+                                <td>{{item.account.price}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                            
                       </div>
                   </fieldset>
                   <br/>
                   <div class="mb-3 text-white">
                   <p class="text">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
-                      
-                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
-                      
-                      <input class="btn btn-primary" type="submit" value="Close">
+                      <p><i class="bi bi-calendar3 me-2"></i><span>{{ moment(item.time_posted).format('LLL') }}.</span></p>
+                      <input class="btn btn-primary close_accept" type="button" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
                       <br/>                  
                   </div> 
                 </form>
@@ -52,7 +73,7 @@
             {% endif %}
 
             {% if item.type == 1 %}
-              <div class="fm-content">
+              <div class="fm-content" id="rejected">
                 <form>
                   <fieldset disabled>
                       <div class="mb-3 title-time-display">
@@ -61,23 +82,21 @@
                       </div>
                       <div class="mb-3">
                         <div class="card-body">
-                          <h5 class="card-title">Verification Message Failed Alert</h5>
-                          <p class="card-text">
+                          <h5 class="card-title text-white">Verification Message Failed Alert</h5>
+                          <p class="card-text text-white">
                             The confirmation message sent to us failed to be authenticated within the given time. please contact our suppport 
                             centre for assistance or try again.
                           </p>
-                          <a href="#" class="btn btn-primary">Close</a>                      
+                       
                       </div>
                   </fieldset>
                   <br/>
                   <div class="mb-3 text-white">
-                  <p class="text">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
+                  
                       
                       <p>{{ moment(item.time_posted).format('LLL') }}.</p>
                       
-                      <input class="btn btn-primary" type="submit" value="Close">
+                      <input class="btn btn-primary" type="submit" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
                       <br/>                  
                   </div> 
                 </form>
@@ -108,17 +127,7 @@
                               </i>
                             </p>
                           </div>
-  
-                          <div class="mb-3">
-                            <label for="disabledTextInput" class="form-label text-white">Account Name</label>
-                            <input type="text" id="account-val" value="{{account.account_name}}" class="form-control" placeholder="Disabled input">
-                          </div>
-  
-                          <div class="mb-3">
-                            <label for="disabledTextInput" class="form-label text-white">Account Type</label>
-                            <input type="text" id="account-val" value="{{account.account_type}} account" class="form-control" placeholder="Disabled input">
-                          </div>
-  
+       
                           <div class="mb-3">
                             <label for="disabledTextInput" class="form-label text-white">Account Email</label>
                             <input type="text" id="account-val" value="{{account.account_email}}" class="form-control" placeholder="Disabled input">
@@ -143,57 +152,29 @@
                         <i class="bi bi-exclamation-triangle warning-red">
                           You have 24 hours from {{ moment(item.time_posted).format('LLL') }} to raise a complaint upon which a refund can be offered !
                         </i>
-                        
-                        
                         <p>{{ moment(item.time_posted).format('LLL') }}.</p>
-                        <input class="btn btn-primary" type="submit" value="Confirm Credentials">
-                        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                          Close/Open
-                        </button>
+                        <form action="" method="POST">
+                          <div class="form-group">
+                            {{ accept_form.csrf_token() }}
+                            {{ accept_form.seller_id(value = item.seller_id) }}
+                            {{ accept_form.account_id(value = item.account_id) }}
+                            {{ accept_form.accept(class="btn btn-primary") }}
+                            <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                              Close/Open
+                            </button>
+                          </div>
+                        </form>
+                        
                        
                         <br/> 
                     </div> 
 
-                    
-                 
 
-
-                  <div class="accordion fm-content">
-                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion fm-content" id="accordionExample2">
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample2">
                       <div class="accordion-body">
                         <form action="" method="POST">
-                          {{ form.csrf_token }}
-                          {{ form.hidden_tag(form.seller_id()) }}
-                              <!-- Buyer phone number -->
-                              <div class="form-group">
-                                {{ form.buyer_phone_number.label(class="form-control-label text-white") }}
-                                {% if form.buyer_phone_number.errors %}
-                                    {{ form.buyer_phone_number(class="form-control form-control-lg is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.buyer_phone_number.errors %}
-                                            <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    {{ form.buyer_phone_number(class="form-control form-control-lg") }}
-                                {% endif %}
-                              </div>
-    
-                              <!-- Seller phone number -->
-                              <div class="form-group">
-                                {{ form.seller_phone_number.label(class="form-control-label text-white") }}
-                                {% if form.seller_phone_number.errors %}
-                                    {{ form.seller_phone_number(class="form-control form-control-lg is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.seller_phone_number.errors %}
-                                            <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    {{ form.seller_phone_number(class="form-control form-control-lg") }}
-                                {% endif %}
-                              </div>
-    
+                          {{ form.csrf_token() }}
                               <!-- Reason -->
                               <div class="form-group">
                                 {{ form.reason.label(class="form-control-label text-white") }}
@@ -223,15 +204,16 @@
                                   {{ form.extended_reason(class="form-control form-control-lg") }}
                               {% endif %}
                             </div>
-    
-                            {{ form.seller_id(value='{}'.format(item.seller_id)) }}
+                            
+                            {{ form.account_id(value=item.account_id) }}
+                            {{ form.seller_id(value=item.seller_id) }}
                             <div class="form-group">
                               {{ form.submit(class="btn btn-danger mt-3") }}
                             </div>
-    
                         </form>
                       </div>
                     </div>
+                    <p class="text-white">If you are not satisfied with the account, please fill the rejection form here:</p>
                     <h2 class="accordion-header" id="headingTwo">
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                         Rejection Form
@@ -239,43 +221,74 @@
                     </h2>
                   </div>
                 </div>
+                <br>
 
                 {% endfor %}                
               {% endif %}
             {% endif %}
 
             {% if item.type == 3 %}
+            <div class="fm-content accepted" id="accepted">
                 <form>
-                  <fieldset disabled>
+                  <fieldset >
                       <div class="mb-3 title-time-display">
                           <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
                           <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
                       </div>
                       <div class="mb-3">
                         <div class="card-body">
-                          <h5 class="card-title">Succeesful Purchase Alert</h5>
-                          <p class="card-text">
-                            We have received the confirmation message sent and have verified it. Please wait while we contact the seller
-                            so as to send you the account credentials so as to acertain validity of the account.
+                          <h5 class="card-title yellow-text">Successful Purchase Alert</h5>
+                          <br>
+                          <p class="card-text text-white">
+                            We have received your confirmation request for the purchased account. Please wait while we contact the seller
+                            for additional account documentation where applicable ie account certificate, license e.t.c. If the account you are purchasing 
+                            desn't require such documentation, you can proceed to change the account credentials then start using the account. 
+                            <br>                 
                           </p>
-                          <a href="#" class="btn btn-primary">Close</a>                      
+                          <div>
+                            <form action="" method="POST">
+                              {{ purchase_completion.csrf_token() }}
+                              {{ purchase_completion.seller_id(value = item.seller_id ) }}
+                              {{ purchase_completion.account_id(value = item.account_id ) }}
+                              <!-- <button type="submit" class="btn btn-success" name="favorite" value="true">
+                                <i class="bi bi-check2-circle" style="font-size:15px;"></i>
+                                Complete Purchase
+                              </button> -->
+                              
+                              {{ purchase_completion.completed(class="btn btn-primary mt-3") }}
+                            </form>
+  
+                            <form action="" method="POST">
+                              {{ partial_completion.csrf_token() }}
+                              {{ partial_completion.seller_id(value = item.seller_id ) }}
+                              {{ partial_completion.account_id(value = item.account_id ) }}
+                              <!-- <button type="submit" class="btn btn-warning" name="favorite" value="true">
+                                <i class="bi bi-three-dots" style="font-size:15px;"></i>
+                                Request Additional Account Credentials
+                              </button> -->
+                              {{ partial_completion.additional_info(class="btn btn-primary mt-3") }}
+                            </form>
+                          </div>
+                          
+                          
                       </div>
                   </fieldset>
                   <br/>
                   <div class="mb-3 text-white">
                   <p class="text">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
-                      
+                    <i class="bi bi-exclamation-triangle warning-red">
+                      You are advised to change account credentials at this point.
+                    </i>   
                       <p>{{ moment(item.time_posted).format('LLL') }}.</p>
-                      
-                      <input class="btn btn-primary" type="submit" value="Close">
+                      <input class="btn btn-primary" type="submit" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
                       <br/>                  
                   </div> 
                 </form>
+              </div>
             {% endif %}
 
             {% if item.type == 4 %}
+            <div class="fm-content accepted" id="accepted">
                 <form>
                   <fieldset disabled>
                       <div class="mb-3 title-time-display">
@@ -284,26 +297,58 @@
                       </div>
                       <div class="mb-3">
                         <div class="card-body">
-                          <h5 class="card-title">Failed Purchase Alert</h5>
-                          <p class="card-text">
-                            We have received the confirmation message sent and have verified it. Please wait while we contact the seller
-                            so as to send you the account credentials so as to acertain validity of the account.
-                          </p>
-                          <a href="#" class="btn btn-primary">Close</a>                      
+                          <h5 class="card-title warning-red">Failed Purchase Alert</h5>
+                          <p class="card-text text-white">
+                            We have received the complaint message sent and still reviewing the complaint. We apologize for the account not meeting your expectation and will begin the  
+                            refund process within our <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">terms of service</a> .
+                            
+                            <p class="text-white">
+                              You can check out other accounts of the same price range before the refund is executed(Before 24 hours from {{ moment(item.time_posted).fromNow(refresh=True) }} here)
+                            </p>
+                          </p>                      
                       </div>
                   </fieldset>
                   <br/>
-                  <div class="mb-3 text-white">
-                  <p class="text">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
-                      
-                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                  <div class="mb-3">
+                  
+                      <i class="bi bi-exclamation-triangle warning-red">
+                      We will issue you with a refund as per our terms of service within 24 hours !
+                      </i>
+                      <p class="text-white">{{ moment(item.time_posted).format('LLL') }}.</p>
                       
                       <input class="btn btn-primary" type="submit" value="Close">
                       <br/>                  
                   </div> 
                 </form>
+              </div>
+              <!--TOS Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content">
+                      <div class="modal-header bg-dark">
+                          <h5 class="modal-title text-white" id="exampleModalLabel">Terms Of Service</h5>
+                          <button type="button" class="text-white btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body px-2">
+                          <ul>
+                              <li>One must register to do any transactions within the market place </li>
+                              <li> The buyers must do money transaction through the official marketplace accounts using their registered details. If not so, it must be communicated clearly. The buyer must indicate the account ID while doing the verification</li>
+                              <li>Transaction will only be complete when the buyer is satisfied with the account. This is when the seller will receive payment and must send other credentials for the account.</li>
+                              <li>The seller only send the logins of the account to the buyer for verification.</li>
+                              <li>Incase of unmet qualities, the buyer is linked directly to the seller for more account clarification, after which the transaction will be complete or a refund will be initiated.</li>
+                              <li>Buyer is given 12hours to reject the account. After receiving all account details and payment is done to the seller, no complains will be accepted.</li>
+                              <li>The marketplace is only responsible for the transactions done through the marketplace. Any transaction done outside is at your own risk.</li>
+                              <li>The reversal of any fund will constitute a 5% fine + admin fees. </li>
+                              <li>f the buyer rejects an account but goes on and change the account details, this will lead to 50-100% fine on the purchase fees.</li>
+                              <li>If the seller fails to upload the credentials of the account, this will result to 50-100% fine on the purchased fees.</li>
+                          </ul>
+                      </div>
+                      <div class="modal-footer bg-dark">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      </div>
+                  </div>
+                  </div>
+                </div>
             {% endif %}
           
           <br>
@@ -312,14 +357,16 @@
 
     {% if seller_msg %}
       {% for item in seller_msg %}
-              <div class="fm-content">
+              {% if item.type == 0 %}
+                <div class="fm-content">
                   <div class="mb-3 title-time-display">
                       <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
                       <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
                   </div>
                   <div class="mb-3">
                       <div class="card-body">
-                        <h5 class="card-title text-white">Buyer Intent Alert</h5>
+                        <h5 class="card-title yellow-text">Buyer Intent Alert</h5>
+                        <br>
                         <p class="card-text text-white">
                           We have received payment from a buyer for your account. Please provide account details to the admin for account verification.
                         </p>                
@@ -328,39 +375,31 @@
                   
                   <br/>
 
+                  <h5 class="card-title yellow-text mb-2">Purchase On Progress Account Details:</h5>
+                 
+                  <table class="table table-dark table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">Account Name</th>
+                        <th scope="col">Account Type</th>
+                        <th scope="col">Account Brand</th>
+                        <th scope="col">Account Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{item.account.account_name}}</td>
+                        <td>{{item.account.account_type.value | replace("_", "  ") | title}}</td>
+                        <td>{{item.account.brand}}</td>
+                        <td>{{item.account.price}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
                   <form action="" method="POST">
                     {{ seller_form.csrf_token }}
                     {{ seller_form.hidden_tag(seller_form.buyer_id(), seller_form.account_id()) }}
-                        <!-- Seller's account Name -->
-                        <div class="form-group">
-                          {{ seller_form.account_name.label(class="form-control-label text-white") }}
-                          {% if seller_form.account_name.errors %}
-                              {{ seller_form.account_name(class="form-control form-control-lg is-invalid") }}
-                              <div class="invalid-feedback">
-                                  {% for error in seller_form.account_name.errors %}
-                                      <span>{{ error }}</span>
-                                  {% endfor %}
-                              </div>
-                          {% else %}
-                              {{ seller_form.account_name(class="form-control form-control-lg") }}
-                          {% endif %}
-                        </div>
-
-                        <!-- Seller's account Type -->
-                        <div class="form-group">
-                          {{ seller_form.account_type.label(class="form-control-label text-white") }}
-                          {% if seller_form.account_type.errors %}
-                              {{ seller_form.account_type(class="form-control form-control-lg is-invalid") }}
-                              <div class="invalid-feedback">
-                                  {% for error in seller_form.account_type.errors %}
-                                      <span>{{ error }}</span>
-                                  {% endfor %}
-                              </div>
-                          {% else %}
-                              {{ seller_form.account_type(class="form-control form-control-lg") }}
-                          {% endif %}
-                        </div>
-
+             
                         <!-- Seller's account Email -->
                         <div class="form-group">
                           {{ seller_form.account_email.label(class="form-control-label text-white") }}
@@ -407,25 +446,210 @@
                         </div>
 
                         {{ seller_form.buyer_id(value='{}'.format(item.buyer_id)) }}
-                        {{ seller_form.account_id(value='{}'.format(item.account_id)) }}
+                        {{ seller_form.account_id(value='{}'.format(item.account.account_id)) }}
                         <div class="form-group">
                           {{ seller_form.submit(class="btn btn-danger mt-3") }}
                         </div>
 
                   </form>
+                  <br>
                   
-                  <div class="mb-3 text-white">
-                  <p class="text">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      You have 24 hours from to raise a complaint upon which a refund can be afforded !
-                      
-                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
-                      
-                      <input class="btn btn-primary" type="submit" value="Close">
+                  <div class="mb-3 text-white">                 
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>   
+                      <input class="btn btn-primary close_accept" type="button" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">       
                       <br/>                  
                   </div> 
               </div>
               <br>
+
+              {% endif %}
+
+              {% if item.type == 3 %}
+                 <div class="fm-content">
+                  <div class="mb-3 title-time-display">
+                      <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                      <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                  </div>
+                  <div class="mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title yellow-text">Additional Information Alert</h5>
+                        <br>
+                        <p class="card-text text-white">
+                          We have received confirmation from the buyer to proceed with the account purchase. If your account requires additional documents ie account certificate, account license e.t.c, you will receive a request 
+                          to provide the documents from the buyer shortly. If the account under sale doesn't require such documents you will receive a prompt to enter your account details i.e paypal email or phone number to complete 
+                          the payment process. 
+                        </p>                
+                      </div>
+                  </div>
+                  
+                  <br/>
+
+                  <h5 class="card-title yellow-text mb-2">Purchased Account Details:</h5>
+                 
+                  <table class="table table-dark table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">Account Name</th>
+                        <th scope="col">Account Type</th>
+                        <th scope="col">Account Brand</th>
+                        <th scope="col">Account Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{item.account.account_name}}</td>
+                        <td>{{item.account.account_type.value | replace("_", "  ") | title}}</td>
+                        <td>{{item.account.brand}}</td>
+                        <td>{{item.account.price}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <hr class="text-white">
+
+                  <br>
+                  
+                  <div class="mb-3 text-white">                 
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>   
+                      <input class="btn btn-primary close_accept" type="button" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">       
+                      <br/>                  
+                  </div> 
+              </div>
+              <br>
+              {% endif %}
+
+              {% if item.type == 4 %}
+              <div class="fm-content accepted" id="accepted">
+                <form>
+                  <fieldset disabled>
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title yellow-text">Failed Purchase Alert</h5>
+                          <br>
+                          <p class="card-text text-white">
+                            The buyer of your account has pulled out from the purchase process. We will review the reason and during this process your account won't be 
+                            publicly available in the marketplace for 24 hrs from {{ moment(item.time_posted).fromNow(refresh=True) }}.
+
+                            You are advised to change the account credentials immediately.
+                            <br>                 
+                          </p>
+                          
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                  <p class="text">
+                    <i class="bi bi-exclamation-triangle warning-red">
+                      You are advised to change account credentials at this point.
+                    </i>   
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      <input class="btn btn-primary" type="submit" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
+                      <br/>                  
+                  </div> 
+                </form>
+              </div>
+              {% endif %}
+
+              {% if item.type == 6 %}
+              <div class="fm-content accepted" id="accepted">
+                <form>
+                  <fieldset >
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title yellow-text">Additional Account Information Request</h5>
+                          <br>
+                          <p class="card-text text-white">
+                            The buyer of your account has requested for additional account credentials account credentials i.e. account certificate, account owner phone number, account licenses and any other document relevant to the account. 
+                            You may upload them as document form (strictly pdf) or image form.
+                            <br> 
+                            <div class="pt-2">
+                              <button type="button" class="btn btn-info" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample"><i class="bi bi-upload bt-icon me-2"></i>Upload Credentials</button>
+                            </div>                
+                          </p>
+                          
+                          
+                          <!-- Accordion Upload Account Details -->
+                          <div class="col-12 p-3 collapse" id="collapseExample">
+                            <div class="card">
+                            <div class="card-header font-weight-bold">Available features</div>
+                            <div class="card-body">
+
+                              <form method="POST">
+                                {{ seller_form_complete.hidden_tag() }}
+                                <!-- Account Certificate upload -->
+                                <div class="form-group">
+                                  {{ seller_form_complete.account_cerificate.label(class="form-control-label text-white") }}
+                                  {% if seller_form_complete.account_cerificate.errors %}
+                                      {{ seller_form_complete.account_cerificate(class="form-control form-control-lg is-invalid") }}
+                                      <div class="invalid-feedback">
+                                          {% for error in seller_form_complete.account_cerificate.errors %}
+                                              <span>{{ error }}</span>
+                                          {% endfor %}
+                                      </div>
+                                  {% else %}
+                                      {{ seller_form_complete.account_cerificate(class="form-control form-control-lg") }}
+                                  {% endif %}
+                                </div>
+        
+                              <!-- Account License upload -->
+                                <div class="form-group">
+                                  {{ seller_form_complete.account_license.label(class="form-control-label text-white") }}
+                                  {% if seller_form_complete.account_license.errors %}
+                                      {{ seller_form_complete.account_license(class="form-control form-control-lg is-invalid") }}
+                                      <div class="invalid-feedback">
+                                          {% for error in seller_form_complete.account_license.errors %}
+                                              <span>{{ error }}</span>
+                                          {% endfor %}
+                                      </div>
+                                  {% else %}
+                                      {{ seller_form_complete.account_license(class="form-control form-control-lg") }}
+                                  {% endif %}
+                                </div>
+
+                                <!-- Seller's Phone number -->
+                                <div class="form-group">
+                                  {{ seller_form_complete.account_owner_number.label(class="form-control-label text-white") }}
+                                  {% if seller_form_complete.account_owner_number.errors %}
+                                      {{ seller_form_complete.account_owner_number(class="form-control form-control-lg is-invalid") }}
+                                      <div class="invalid-feedback">
+                                          {% for error in seller_form_complete.account_owner_number.errors %}
+                                              <span>{{ error }}</span>
+                                          {% endfor %}
+                                      </div>
+                                  {% else %}
+                                      {{ seller_form_complete.account_owner_number(class="form-control form-control-lg") }}
+                                  {% endif %}
+                                </div>
+
+                              </form>
+
+                            </div>
+                            <div class="card-footer">
+                              {{ seller_form_complete.submit(class="btn btn-danger") }}
+                            </div>
+                          </div>
+                      </div>
+                          
+                          
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      <button type="submit" class="btn btn-primary" id="{{ item.id }}" onclick="delete_msg(this)"><i class="bi bi-x-square me-1"></i>Close</button>
+                      <br/>                  
+                  </div> 
+                </form>
+              </div>
+              {% endif %}
+              
       {% endfor %}      
     {% endif %}
     
@@ -520,50 +744,42 @@
 
 {% block footer %}
 <div class="border-top pt-3"></div>
-<div class="container footer-container">
+<div class="footer-container">
   <footer class="py-5">
     <div class="row">
+
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Get In Touch</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-geo-alt-fill mr-2"></i>Juja</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-envelope-fill mr-2"></i>bushwriters@gmail.com</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-headset mr-2"></i>Customer Support, Sun - Fri, 7AM-10PM</p></li>
         </ul>
       </div>
 
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Quick Links</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.viewpage') }}" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.guide') }}" class="nav-link p-0 footer-color">Guide</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.seller') }}" class="nav-link p-0 footer-color">Become A Seller</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.contact_us') }}" class="nav-link p-0 footer-color">Contact Us</a></li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
-        </ul>
-      </div>
+      
 
       <div class="col-md-5 offset-md-1 mb-3">
         <form>
           <h5 class="text-white">Subscribe to our newsletter</h5>
           <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
-          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-            <label for="newsletter1" class="visually-hidden">Email address</label>
-            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
-            <button class="btn btn-primary" type="button">Subscribe</button>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Email Address" aria-label="Recipient's email input" aria-describedby="button-addon4">
+            <div class="input-group-append" id="button-addon4">
+              <button class="btn btn-primary" type="button">Subscribe</button>
+            </div>
           </div>
         </form>
       </div>
@@ -586,7 +802,25 @@
 
 {% block scripts %}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  <script>
   
+    const delete_msg = (e) => {
+        let ref = e.id
+        console.log(ref)
+        // post message id to backend
+        $.ajax({
+          type: "POST",
+          url: "{{url_for('main.delete_msg') }}",
+          data: {"ref" : ref },
+          dataType: 'json',
+          
+        })
+        
+        // reload window to trigger change
+        window.location.reload();
+    }
+
+  </script>
 {% endblock scripts %}
   
 

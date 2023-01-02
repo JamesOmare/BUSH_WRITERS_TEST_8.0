@@ -1,7 +1,21 @@
-{% extends 'view3.html' %}
+{% extends 'view.html' %}
+
+
+{% block result %}
+<p>{{ account.items | length }} accounts found matching '<i>{{ keyword }}</i>' on this page</p>
+{% endblock result %}
+
+{% block order_by %}{% endblock order_by %}
+
+{% block search_back %}
+<input type="button" class="btn btn-dark rounded" value="Go back!" onclick="history.back()">
+{% endblock search_back %}
+    
+
 
 {% block search %}
-    
+<!-- <h2>{{ account.items | length }} accounts found matching '<i>{{ keyword }}</i> '</h2> -->
+
 
     {% if account %}
     <div class="container mt-2 mb-5">
@@ -10,7 +24,6 @@
                 {% for item in account.items %}
 
                     <div class="row p-2 bg-white border rounded">
-                        <!-- <div class="col-md-3 mt-1">{{ loop.index }}</div> -->
                         {% set random_no = range(1, 4)|random|string() %}        
                         {% if item.account_type.value == 'article_account' %} 
                         <div class="col-md-3 no_bg_color mt-1"><img class="img-fluid img-responsive rounded" src="{{url_for('static', filename='images/img/article'+random_no+'.png')}}"></div>
@@ -23,7 +36,7 @@
                         <div class="col-md-6 mt-1">
                             <h5>{{ item.account_type.value | replace("_", "  ") | title }}</h5>
                             <div class="d-flex flex-row">
-                                <div class="ratings mr-2"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div><span>310</span>
+                                <div class="ratings mr-2"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
                             </div>
                             <p class="text-justify text-truncate para mb-0"> {{ item.description }}.<br><br></p>
                         </div>
@@ -34,26 +47,133 @@
                           
                             <div class="d-flex flex-column position_btn">
                                 
-                                    <button class="btn btn-success btn-sm " type="button">
-                                        Purchase
-                                    </button>
-                                    <button class="btn btn-primary btn-sm mt-2" type="button">
-                                        View
-                                    </button>
+                                <button class="btn btn-success btn-sm btn-purchase" type="button" data-toggle="modal" data-target="#exampleModal">
+                                    Purchase
+                                </button>
+
+                                <a href="{{url_for('main.product_view', item_id=item.account_id)}}" class="btn btn-primary btn-sm mt-2">View</a>
                                
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal" data-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            {% if current_user.is_authenticated %}
+                                <div class="modal-header bg-dark">
+                                    <h5 class="modal-title text-white" id="exampleModalLabel">Purchase Options </h5>
+                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h5>Choose Payment Option</h5>
+                                        <!-- <p>This <a href="#" role="button" class="btn btn-secondary popover-test" title="Popover title" data-content="Popover body content is set in this attribute.">button</a> triggers a popover on click.</p> -->
+                                        <hr>
+                                        <h5>Use the dropdown below to select your payment method.</h5>
+                                        <form action="" method="POST">
+    
+                                            {{ purchase_form.csrf_token }}
+                                            {{ purchase_form.hidden_tag(purchase_form.info()) }}
+
+                                            {{ purchase_form.info(value='{}'.format(item.account_id)) }}
+                                            {{ purchase_form.payment_method(class = "form-select") }}
+                                            <hr>
+                                            <p>
+                                                {{ purchase_form.submit(class="btn btn-secondary") }}
+                                                <button type="button" class="btn btn-success" data-dismiss="modal">Exit</button>
+                                            </p>
+                                            
+                                        </form>
+                                        
+                                    </div>
+                            
+                                    {% else %}
+                                    <div class="modal-header bg-dark">
+                                        <h5 class="modal-title text-white" id="exampleModalLabel">Not Logged In!</h5>
+                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h5>Log In to purchase account!</h5>
+                                            <!-- <p>This <a href="#" role="button" class="btn btn-secondary popover-test" title="Popover title" data-content="Popover body content is set in this attribute.">button</a> triggers a popover on click.</p> -->
+                                            <hr>
+                                            <h5>One must be logged in to purchase an account.</h5>
+                                            <a href="{{ url_for('auth.login') }}" role="button" class="btn btn-success popover-test" title="Popover title" data-content="Go to login page.">Login/Register</a>
+                                        </div>
+                                   
+                            {% endif %}
+                                
+                            
+                            <div class="modal-footer bg-dark">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
                         </div>
                     </div>
             
                 {% endfor %}
    
-    {% else %}
-    <h2>No account found matching '<i>{{ keyword }}</i> '</h2>
-    <input type="button" class="btn btn-dark" value="Go back!" onclick="history.back()">
     {% endif %}
     
     
 {% endblock %}
+
+
+{% block filters %}
+                
+            <div class="col-md-3 filter">
+                <form action="" method="POST">
+                    {{ filter_form.csrf_token }}
+                    <h2 class="grid-title"><i class="bi bi-search"></i> Filters</h2>
+                    <hr>
+
+                  
+                    
+                    <!-- BEGIN FILTER BY CATEGORY -->
+                    <h4>By category:</h4>
+                    <div class="">
+                    <label>{{ filter_form.article_ac(class="icheck") }} Article Account</label>
+                    </div>
+                    <div class="">
+                    <label>{{ filter_form.academic_ac(class="icheck") }} Academic Writing Account</label>
+                    </div>
+                    <div class="">
+                    <label>{{ filter_form.blogging_ac(class="icheck") }} Blogging Account</label>
+                    </div>
+                    <hr>
+                    
+                    <!-- END FILTER BY CATEGORY -->
+                    
+                    <div class="padding"></div>
+                    
+                    
+                    <!-- BEGIN FILTER BY PRICE -->
+                    <h4>By price:</h4>
+                    Between
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Ksh</span>
+                        {{ filter_form.price_range_a(class="form-control") }}
+                    </div>
+                    To
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Ksh</span>
+                        </div>
+                        {{ filter_form.price_range_b(class="form-control") }}
+                      </div>
+                  
+                    <br>
+                <!-- END FILTER BY PRICE -->
+                
+                </form>
+            </div>
+
+{% endblock filters %}
+            
 
 {% block search_pagination %}
 

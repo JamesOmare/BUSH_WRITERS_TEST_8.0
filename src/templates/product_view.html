@@ -45,9 +45,32 @@
               <div class="row gy-4 row-cols-1 row-cols-sm-2 row-cols-md-3">
                   {% for image in images %}
                   <div class="col">
-                    
                     <img src="{{ url_for('static', filename='images/account_images/'+image.image_files) }}" class="gallery-item" alt="gallery">
+
+                      <!-- Modal -->
+                      <div class="modal fade {{ image.image_files }}" id="gallery-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <img class="modal-img" alt="modal img">
+                          </div>
+                          {% if account.user_id == current_user.id %}
+                          <div>
+                            <button type="button" class="btn btn-danger ms-3 mb-2" data-bs-toggle="modal" data-bs-target="#upload-image" id="{{ image.id }}" onclick="delete_photo(this)">Delete Image</button>
+                          </div>
+                          {% endif %}
+                          </div>
+                        </div>
+                      </div>
+
                   </div>
+
+                  
+
+
                   {% endfor %}
                   
                   
@@ -55,19 +78,7 @@
             </div>
           </section>
 
-          <!-- Modal -->
-          <!-- <div class="modal fade" id="gallery-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <img src="https://images.unsplash.com/photo-1453791052107-5c843da62d97?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80" class="modal-img" alt="modal img">
-                </div>
-              </div>
-            </div>
-          </div> -->
+          
           <!-- End Gallery Section -->
 
           <!-- Content section -->
@@ -101,9 +112,9 @@
             </div>
             
           </div>
-
+          
           <!-- Upload Images Form -->
-          <div class="modal fade" id="upload-image" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal fade" id="upload-image" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
@@ -111,21 +122,29 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form>
-                    <div class="mb-3">
-                      <label for="recipient-name" class="col-form-label">Recipient:</label>
-                      <input type="text" class="form-control" id="recipient-name">
+                  <form method="POST" action="" enctype="multipart/form-data" >
+                    {{ upload_form.csrf_token() }}
+                    {{ upload_form.account_id(value = account.account_id) }}
+                    {% for error in upload_form.photo.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            {{ upload_form.photo(class = 'form-control') }}
+                        </div>
+                        
                     </div>
-                    <div class="mb-3">
-                      <label for="message-text" class="col-form-label">Message:</label>
-                      <textarea class="form-control" id="message-text"></textarea>
-                    </div>
-                  </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Send message</button>
-                </div>
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="col-auto">
+                      {{ upload_form.upload(class = 'btn btn-success') }}
+                    
+                  </div>
+                  </div>
+              </form>
               </div>
             </div>
           </div>
@@ -235,50 +254,42 @@
 
 {% block footer %}
 <div class="border-top pt-3"></div>
-<div class="container footer-container">
+<div class="footer-container">
   <footer class="py-5">
     <div class="row">
+
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Get In Touch</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2 footer-color"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-geo-alt-fill mr-2"></i>Juja</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-envelope-fill mr-2"></i>bushwriters@gmail.com</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-headset mr-2"></i>Customer Support, Sun - Fri, 7AM-10PM</p></li>
         </ul>
       </div>
 
       <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
+        <h5 class="text-white">Quick Links</h5>
         <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.viewpage') }}" class="nav-link p-0 footer-color">Home</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.guide') }}" class="nav-link p-0 footer-color">Guide</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.seller') }}" class="nav-link p-0 footer-color">Become A Seller</a></li>
+          <li class="nav-item mb-2"><a href="{{ url_for('main.contact_us') }}" class="nav-link p-0 footer-color">Contact Us</a></li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-2 mb-3">
-        <h5 class="text-white">Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 footer-color">About</a></li>
-        </ul>
-      </div>
+      
 
       <div class="col-md-5 offset-md-1 mb-3">
         <form>
           <h5 class="text-white">Subscribe to our newsletter</h5>
           <p class="footer-color">Monthly digest of what's new and exciting from us.</p>
-          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-            <label for="newsletter1" class="visually-hidden">Email address</label>
-            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
-            <button class="btn btn-primary" type="button">Subscribe</button>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Email Address" aria-label="Recipient's email input" aria-describedby="button-addon4">
+            <div class="input-group-append" id="button-addon4">
+              <button class="btn btn-primary" type="button">Subscribe</button>
+            </div>
           </div>
         </form>
       </div>
@@ -300,6 +311,27 @@
 {% endblock footer %}
     
 {% block scripts %}
+  <script type="text/javascript" src = "{{url_for('static', filename = 'js/photo_modal.js')}}" ></script> 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+
+  <script>
+  
+    const delete_photo = (e) => {
+        let ref = e.id
+        console.log(ref)
+        // post message id to backend
+        $.ajax({
+          type: "POST",
+          url: "{{url_for('main.delete_image') }}",
+          data: {"ref" : ref },
+          dataType: 'json',
+          
+        })
+        
+        // reload window to trigger change
+        window.location.reload();
+    }
+
+  </script>
 {% endblock scripts %}
       

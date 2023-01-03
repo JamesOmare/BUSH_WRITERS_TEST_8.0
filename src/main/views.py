@@ -18,6 +18,7 @@ from ..models.confirmation import Confirmation
 from ..models.account_credentials import Account_Credentials
 from ..models.payment import Payment
 from ..models.subscription_list import Subscription
+from ..models.files import File
 from ..auth.form_fields import (Seller_Profile_Form, Account_Images, Update_User_Account, Payment_Method, 
                                 Complaint, Confirmation_Form, Seller_Account_Details, Search, FilteredSearch,
                                 Mpesa_Confirm, Contact_Us, Order_By, Seller_Complete_Account_Details, Accept_Account,
@@ -66,16 +67,21 @@ def save_pictures(form_picture):
 
     return picture_fn
 
-def save_file_credentials(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(current_app.root_path, 'static/images/file_credentials', picture_fn)
+def save_files(form_file):
+    if form_file:
+        # generate random hashes as file name
+        random_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(form_file.filename)
+        picture_fn = random_hex + f_ext
+        picture_path = os.path.join(current_app.root_path, 'static/assets/files', picture_fn)
+        form_file.save(picture_path)
 
-    img = PIL.Image.open(form_picture)
-    img.save(picture_path)
+        return picture_fn
 
-    return picture_fn
+def is_file_empty(file_path):
+    """ Check if file is empty by confirming if its size is 0 bytes"""
+    # Check if file exist and it is empty
+    return os.path.exists(file_path) and os.stat(file_path).st_size == 0
 
 
 @main.route('/search', methods = ['POST', 'GET'])
@@ -556,63 +562,71 @@ def chat(id):
     
 
     elif seller_msg and not buyer_msg:
-        if request.method == 'POST' and seller_form.submit.data and seller_form.validate_on_submit():
-            buyer_id = seller_form.buyer_id.data
-            account_id = seller_form.account_id.data
-            account_email = seller_form.account_email.data
-            account_url = seller_form.account_url.data
-            account_passphrase = seller_form.account_passphrase.data
+        if request.method == 'POST': 
+            if seller_form.submit.data and seller_form.validate_on_submit():
+                buyer_id = seller_form.buyer_id.data
+                account_id = seller_form.account_id.data
+                account_email = seller_form.account_email.data
+                account_url = seller_form.account_url.data
+                account_passphrase = seller_form.account_passphrase.data
 
-            credentials_entry = Account_Credentials(
-                seller_id = current_user.id,
-                buyer_id = buyer_id,
-                account_id = account_id,
-                account_email = account_email,
-                account_url = account_url,
-                account_passphrase = account_passphrase
+                credentials_entry = Account_Credentials(
+                    seller_id = current_user.id,
+                    buyer_id = buyer_id,
+                    account_id = account_id,
+                    account_email = account_email,
+                    account_url = account_url,
+                    account_passphrase = account_passphrase
 
-            )
+                )
 
-            db.session.add(credentials_entry)
-            db.session.commit()
-            logging.info(f'Successfully sent account credentials to the buyer.')
+                db.session.add(credentials_entry)
+                db.session.commit()
+                logging.info(f'Successfully sent account credentials to the buyer.')
 
-            alert = Notification.query.filter_by(account_id = account_id).first()
-            updated_type = 2
-            alert.type = updated_type
-            db.session.commit()
-            logging.info(f'Successfully updated notification status to "2"(Account credentials added alert) which will alert the buyer with the account credentials i.e email, hyperlink for the buyer to decide to purchase or reject account.')
+                alert = Notification.query.filter_by(account_id = account_id).first()
+                updated_type = 2
+                alert.type = updated_type
+                db.session.commit()
+                logging.info(f'Successfully updated notification status to "2"(Account credentials added alert) which will alert the buyer with the account credentials i.e email, hyperlink for the buyer to decide to purchase or reject account.')
 
-            flash('Successfully sent account credential details to admin, Please wait for account verification!', 'success')
-            return render_template('chat.html', seller_msg = seller_msg, seller_form = seller_form, seller_form_complete = seller_form_complete)
+                flash('Successfully sent account credential details to admin, Please wait for account verification!', 'success')
+                return render_template('chat.html', seller_msg = seller_msg, seller_form = seller_form, seller_form_complete = seller_form_complete)
 
-        elif request.method == 'POST' and seller_form_complete.submit.data and seller_form_complete.validate_on_submit():
-                seller_id = seller_form_complete.seller_id.data
-                account_id = seller_form_complete.account_id.data
-                account_cerificate = seller_form_complete.account_cerificate.data
-                account_license = seller_form_complete.account_license.data
-                other_documents = seller_form_complete.other.data
+            elif seller_form_complete.submit.data and seller_form_complete.validate_on_submit():
+                    buyer_id = seller_form_complete.buyer_id.data
+                    account_id = seller_form_complete.account_id.data
+                    account_credentials = seller_form_complete.account_credentials.data
 
-                # if photo:
-                #     filename = secure_filename(photo.filename)
-                #     file_names.append(filename)
-                #     photos.save(photo)
+                    if account_credentials:
+                        for file in account_credentials:
+                            # Filter Image
+                            doc_file = save_files(file)
 
-                # ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+                            # Save record
+                            file_entry = File(
+                                doc_file = doc_file,
+                                seller_id = current_user.id,
+                                buyer_id = buyer_id,
+                                account_id = account_id
+                            )
+                            db.session.add(file_entry)
+                        db.session.commit()
+                        logging.info(f'Successfully added pdf file record to the database')
 
-                # def allowed_file(filename):
-                #     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+                        
+                        alert = Notification.query.filter_by(account_id = account_id).first()
+                        updated_type = 7
+                        alert.type = updated_type
+                        db.session.commit()
+                        logging.info(f'Successfully updated notification status to "7"(Awaiting user acceptance) which will alert the buyer with the uploaded credentials i.e account certificates, account license e.t.c.')
 
-                # for file in account_cerificate:
-                #     if file and allowed_file(file.filename):
-                #         filename = secure_filename(file.filename)
-                #         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                # flash('File(s) successfully uploaded')
-
-                
-                
-                flash('Account Purchase Confirmation approved.', 'success')
-                return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form) 
+                    
+                    flash('Successfully sent the files and credentials to the admin for verification. Please wait.', 'success')
+                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, seller_form_complete = seller_form_complete) 
+            
+            else:
+                flash('Failed to send message, check for errors in upload content', 'danger')
 
         return render_template('chat.html', seller_msg = seller_msg, seller_form = seller_form, seller_form_complete = seller_form_complete)
 

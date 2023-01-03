@@ -174,7 +174,7 @@
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample2">
                       <div class="accordion-body">
                         <form action="" method="POST">
-                          {{ form.csrf_token() }}
+                          {{ form.csrf_token }}
                               <!-- Reason -->
                               <div class="form-group">
                                 {{ form.reason.label(class="form-control-label text-white") }}
@@ -247,7 +247,7 @@
                           </p>
                           <div>
                             <form action="" method="POST">
-                              {{ purchase_completion.csrf_token() }}
+                              {{ purchase_completion.csrf_token }}
                               {{ purchase_completion.seller_id(value = item.seller_id ) }}
                               {{ purchase_completion.account_id(value = item.account_id ) }}
                               <!-- <button type="submit" class="btn btn-success" name="favorite" value="true">
@@ -339,7 +339,7 @@
                               <li>Buyer is given 12hours to reject the account. After receiving all account details and payment is done to the seller, no complains will be accepted.</li>
                               <li>The marketplace is only responsible for the transactions done through the marketplace. Any transaction done outside is at your own risk.</li>
                               <li>The reversal of any fund will constitute a 5% fine + admin fees. </li>
-                              <li>f the buyer rejects an account but goes on and change the account details, this will lead to 50-100% fine on the purchase fees.</li>
+                              <li>If the buyer rejects an account but goes on and change the account details, this will lead to 50-100% fine on the purchase fees.</li>
                               <li>If the seller fails to upload the credentials of the account, this will result to 50-100% fine on the purchased fees.</li>
                           </ul>
                       </div>
@@ -555,7 +555,8 @@
 
               {% if item.type == 6 %}
               <div class="fm-content accepted" id="accepted">
-                <form>
+                <form method="POST" enctype="multipart/form-data">
+                  {{ seller_form.csrf_token }}
                   <fieldset >
                       <div class="mb-3 title-time-display">
                           <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
@@ -581,41 +582,24 @@
                             <div class="card-header font-weight-bold">Available features</div>
                             <div class="card-body">
 
-                              <form method="POST">
-                                {{ seller_form_complete.hidden_tag() }}
-                                <!-- Account Certificate upload -->
+                                <!-- Documents upload -->
                                 <div class="form-group">
-                                  {{ seller_form_complete.account_cerificate.label(class="form-control-label text-white") }}
-                                  {% if seller_form_complete.account_cerificate.errors %}
-                                      {{ seller_form_complete.account_cerificate(class="form-control form-control-lg is-invalid") }}
+                                  {{ seller_form_complete.account_credentials.label(class="form-control-label") }}<b style="color: #dc3545;">*</b><span style="color: #dc3545;"> (only pdf files are accepted, max: 5 files.)</span>
+                                  {% if seller_form_complete.account_credentials.errors %}
+                                      {{ seller_form_complete.account_credentials(class="form-control form-control-lg is-invalid") }}
                                       <div class="invalid-feedback">
-                                          {% for error in seller_form_complete.account_cerificate.errors %}
+                                          {% for error in seller_form_complete.account_credentials.errors %}
                                               <span>{{ error }}</span>
                                           {% endfor %}
                                       </div>
                                   {% else %}
-                                      {{ seller_form_complete.account_cerificate(class="form-control form-control-lg") }}
-                                  {% endif %}
-                                </div>
-        
-                              <!-- Account License upload -->
-                                <div class="form-group">
-                                  {{ seller_form_complete.account_license.label(class="form-control-label text-white") }}
-                                  {% if seller_form_complete.account_license.errors %}
-                                      {{ seller_form_complete.account_license(class="form-control form-control-lg is-invalid") }}
-                                      <div class="invalid-feedback">
-                                          {% for error in seller_form_complete.account_license.errors %}
-                                              <span>{{ error }}</span>
-                                          {% endfor %}
-                                      </div>
-                                  {% else %}
-                                      {{ seller_form_complete.account_license(class="form-control form-control-lg") }}
+                                      {{ seller_form_complete.account_credentials(class="form-control form-control-lg") }}
                                   {% endif %}
                                 </div>
 
                                 <!-- Seller's Phone number -->
                                 <div class="form-group">
-                                  {{ seller_form_complete.account_owner_number.label(class="form-control-label text-white") }}
+                                  {{ seller_form_complete.account_owner_number.label(class="form-control-label") }}<b style="color: #dc3545;">*</b>
                                   {% if seller_form_complete.account_owner_number.errors %}
                                       {{ seller_form_complete.account_owner_number(class="form-control form-control-lg is-invalid") }}
                                       <div class="invalid-feedback">
@@ -627,8 +611,10 @@
                                       {{ seller_form_complete.account_owner_number(class="form-control form-control-lg") }}
                                   {% endif %}
                                 </div>
-
-                              </form>
+                                {{ seller_form.buyer_id(value=item.buyer_id) }}
+                                {{ seller_form.account_id(value=item.account.account_id) }}
+                                <hr>
+                                <div class="text-center text-muted"><b style="color: #dc3545;">*</b> The fields marked with * are required</div>                         
 
                             </div>
                             <div class="card-footer">
@@ -647,6 +633,65 @@
                       <br/>                  
                   </div> 
                 </form>
+              </div>
+              {% endif %}
+
+              {% if item.type == 7 %}
+              <div class="fm-content accepted" id="accepted">
+                <form>
+                  <fieldset disabled>
+                      <div class="mb-3 title-time-display">
+                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title yellow-text">Awaiting Purchase Alert</h5>
+                          <br>
+                          <p class="card-text text-white">
+                            We have received the submitted documents and will be reviewing them before sending it to the buyer for confirmation. Once the buyer
+                            validates the documents authenticity, this will conclude the transaction and you will receive payment as per our <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">terms of service</a>.
+                            <br>                 
+                          </p>
+                          
+                      </div>
+                  </fieldset>
+                  <br/>
+                  <div class="mb-3 text-white">
+                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                      <input class="btn btn-primary" type="submit" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
+                      <br/>                  
+                  </div> 
+                </form>
+              </div>
+
+              <!--TOS Modal -->
+              <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h5 class="modal-title text-white" id="exampleModalLabel">Terms Of Service</h5>
+                        <button type="button" class="text-white btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body px-2">
+                        <ul>
+                            <li>One must register to do any transactions within the market place </li>
+                            <li> The buyers must do money transaction through the official marketplace accounts using their registered details. If not so, it must be communicated clearly. The buyer must indicate the account ID while doing the verification</li>
+                            <li>Transaction will only be complete when the buyer is satisfied with the account. This is when the seller will receive payment and must send other credentials for the account.</li>
+                            <li>The seller only send the logins of the account to the buyer for verification.</li>
+                            <li>Incase of unmet qualities, the buyer is linked directly to the seller for more account clarification, after which the transaction will be complete or a refund will be initiated.</li>
+                            <li>Buyer is given 12hours to reject the account. After receiving all account details and payment is done to the seller, no complains will be accepted.</li>
+                            <li>The marketplace is only responsible for the transactions done through the marketplace. Any transaction done outside is at your own risk.</li>
+                            <li>The reversal of any fund will constitute a 5% fine + admin fees. </li>
+                            <li>If the buyer rejects an account but goes on and change the account details, this will lead to 50-100% fine on the purchase fees.</li>
+                            <li>If the seller fails to upload the credentials of the account, this will result to 50-100% fine on the purchased fees.</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer bg-dark">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+                </div>
               </div>
               {% endif %}
               

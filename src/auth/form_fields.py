@@ -166,9 +166,7 @@ class Seller_Account_Details(FlaskForm):
 
 
 class Seller_Complete_Account_Details(FlaskForm):
-    account_cerificate = FileField(validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), FileRequired()])
-    account_license = FileField(validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), FileRequired()])
-    other = MultipleFileField('Upload other relevant documents if necessary', validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), Optional()], render_kw={'multiple': True})
+    account_credentials = MultipleFileField('Upload relevant documents i.e account license, account certificate e.t.c', validators=[FileAllowed(['pdf'], 'Only pdf documents are allowed'), DataRequired(), Length(max=5, message='File uploads is limited to a maximum of 5 files.')], render_kw={'multiple': True})
     account_owner_number = TelField('Phone', validators=[DataRequired()])
     buyer_id = HiddenField()
     account_id = HiddenField()

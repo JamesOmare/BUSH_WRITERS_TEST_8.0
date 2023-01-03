@@ -83,14 +83,14 @@
                         </symbol>
                     </svg>
                     <div class="alert alert-{{category}} d-flex alert-dismissible" role="alert">
-                        {% if category == 'error' %}
+                        {% if category == 'danger' %}
                         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#exclamation-triangle-fill"/></svg>
                         {% elif category == 'success' %}
                         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#check-circle-fill"/></svg>
                         {% else %}
                         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
                         {% endif %}
-                        
+
                         <div>
                         {{message}}
                         </div>

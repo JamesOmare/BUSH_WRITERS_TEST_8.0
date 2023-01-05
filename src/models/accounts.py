@@ -30,10 +30,12 @@ class Account(db.Model):
     account_creation_date = db.Column(db.Date, nullable = False)
     #needs to be time separately
     time_posted = db.Column(db.DateTime (timezone = True), default = func.now())
+    date_modified = db.Column(db.DateTime(timezone = True), nullable=False, server_default=func.now(), onupdate=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'))
     images = db.relationship('Image', backref = 'account', passive_deletes = True, lazy='dynamic' )
     notifications = db.relationship('Notification', backref = 'account', passive_deletes = True, lazy='dynamic')
     complaints = db.relationship('Complaints', backref = 'account', passive_deletes = True, lazy='dynamic')
+    account_credentials = db.relationship('Account_Credentials', backref = 'account', passive_deletes = True, lazy='dynamic')
 
 
     def __repr__(self):

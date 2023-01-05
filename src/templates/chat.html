@@ -105,9 +105,6 @@
             {% endif %}
 
             {% if item.type == 2 %}
-              {% if accounts %}
-                {% for account in accounts %}
-
                 <div class="accordion fm-content" id="accordionExample">    
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                       <div class="accordion-body ">
@@ -119,7 +116,7 @@
 
                           <div>
                             <p class="mb-3 text-white">
-                              This is the credentials for account {{ account.account_name }}. Check the account credentials, 
+                              This is the credentials for account <span class="yellow-text">{{ item.account.account_name }}</span>. Check the account credentials, 
                               status to validate authenticity of the account before clicking the confirmation button.
                               <br>
                               <i class="bi bi-exclamation-triangle warning-red">
@@ -127,7 +124,9 @@
                               </i>
                             </p>
                           </div>
-       
+
+                          {% for account in accounts %}
+                          {% if account.account_id == item.account_id %}
                           <div class="mb-3">
                             <label for="disabledTextInput" class="form-label text-white">Account Email</label>
                             <input type="text" id="account-val" value="{{account.account_email}}" class="form-control" placeholder="Disabled input">
@@ -142,6 +141,8 @@
                             <label for="disabledTextInput" class="form-label text-white">Account Passphrase</label>
                             <input type="text" id="account-val" value="{{account.account_passphrase}}" class="form-control" placeholder="Disabled input">
                           </div>
+                          {% endif %}
+                          {% endfor %}
                         </fieldset>
                       </div>
                     </div>
@@ -222,69 +223,59 @@
                   </div>
                 </div>
                 <br>
-
-                {% endfor %}                
-              {% endif %}
             {% endif %}
 
             {% if item.type == 3 %}
             <div class="fm-content accepted" id="accepted">
-                <form>
-                  <fieldset >
-                      <div class="mb-3 title-time-display">
-                          <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
-                          <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
-                      </div>
-                      <div class="mb-3">
-                        <div class="card-body">
-                          <h5 class="card-title yellow-text">Successful Purchase Alert</h5>
-                          <br>
-                          <p class="card-text text-white">
-                            We have received your confirmation request for the purchased account. Please wait while we contact the seller
-                            for additional account documentation where applicable ie account certificate, license e.t.c. If the account you are purchasing 
-                            desn't require such documentation, you can proceed to change the account credentials then start using the account. 
-                            <br>                 
-                          </p>
-                          <div>
-                            <form action="" method="POST">
-                              {{ purchase_completion.csrf_token }}
-                              {{ purchase_completion.seller_id(value = item.seller_id ) }}
-                              {{ purchase_completion.account_id(value = item.account_id ) }}
-                              <!-- <button type="submit" class="btn btn-success" name="favorite" value="true">
-                                <i class="bi bi-check2-circle" style="font-size:15px;"></i>
-                                Complete Purchase
-                              </button> -->
-                              
-                              {{ purchase_completion.completed(class="btn btn-primary mt-3") }}
-                            </form>
-  
-                            <form action="" method="POST">
-                              {{ partial_completion.csrf_token() }}
-                              {{ partial_completion.seller_id(value = item.seller_id ) }}
-                              {{ partial_completion.account_id(value = item.account_id ) }}
-                              <!-- <button type="submit" class="btn btn-warning" name="favorite" value="true">
-                                <i class="bi bi-three-dots" style="font-size:15px;"></i>
-                                Request Additional Account Credentials
-                              </button> -->
-                              {{ partial_completion.additional_info(class="btn btn-primary mt-3") }}
-                            </form>
-                          </div>
-                          
-                          
-                      </div>
-                  </fieldset>
-                  <br/>
-                  <div class="mb-3 text-white">
-                  <p class="text">
-                    <i class="bi bi-exclamation-triangle warning-red">
-                      You are advised to change account credentials at this point.
-                    </i>   
-                      <p>{{ moment(item.time_posted).format('LLL') }}.</p>
-                      <input class="btn btn-primary" type="submit" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
-                      <br/>                  
-                  </div> 
-                </form>
-              </div>
+                <fieldset >
+                    <div class="mb-3 title-time-display">
+                        <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                        <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title yellow-text">Successful Purchase Alert</h5>
+                        <br>
+                        <p class="card-text text-white">
+                          We have received your confirmation request for the purchased account and have approved it. If the account you are purchasing 
+                          requires further documents i.e account certificate, license e.t.c., you can proceed to request those documents from the seller below. if the account 
+                          you intend to purchase doesn't require such documents, you can proceed to click the complete purchase option. 
+                          <br>                 
+                        </p>
+                        <div>
+
+                          <!-- form for buyer to choose purchase status -->
+                          <form action="" method="POST">
+                            {{ purchase_status.csrf_token }}
+                            {{ purchase_status.seller_id(value = item.seller_id ) }}
+                            {{ purchase_status.account_id(value = item.account_id ) }}
+                            
+                            <button type="submit" name="completed" value="true" class="btn btn-success mt-3 me-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-1" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"></path>
+                              </svg>
+                              Complete Purchase
+                            </button>
+
+                            <button type="submit" name="additional_info" value="true" class="btn btn-info mt-3 me-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                                <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"></path>
+                              </svg>
+                              Request Additional Credentials
+                            </button>
+                          </form>
+
+                        </div>                            
+                    </div>
+                </fieldset>
+                <br/>
+                <div class="mb-3 text-white">
+                    <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                    <input class="btn btn-primary" type="submit" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">
+                    <br/>                  
+                </div> 
+            </div>
             {% endif %}
 
             {% if item.type == 4 %}
@@ -350,7 +341,58 @@
                   </div>
                 </div>
             {% endif %}
-          
+
+            {% if item.type == 5 %}
+              <div class="fm-content accepted" id="accepted">
+                <fieldset >
+                    <div class="mb-3 title-time-display">
+                        <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                        <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title yellow-text">Completed Purchase Alert</h5>
+                        <br>
+                        <p class="card-text text-white">
+                          We have received your confirmation request to finalize purchase of the account <span class="yellow-text">{{ item.account.account_name }}</span>  and have finalized it.
+                          You are free to use the account and are highly advised to change the credentials at this point.
+                          <br>                 
+                        </p>
+
+                        <h5 class="card-title yellow-text mb-2">Purchased Account Details:</h5>
+                          <table class="table table-dark table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col">Account Name</th>
+                                <th scope="col">Account Type</th>
+                                <th scope="col">Account Brand</th>
+                                <th scope="col">Account Price</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{item.account.account_name}}</td>
+                                <td>{{item.account.account_type.value | replace("_", "  ") | title}}</td>
+                                <td>{{item.account.brand}}</td>
+                                <td>{{item.account.price}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                    </div>
+                </fieldset>
+                <br/>
+                <div class="mb-3 text-white">
+                <p class="text">
+                  <i class="bi bi-exclamation-triangle warning-red">
+                    You are advised to change account credentials at this point.
+                  </i>   
+                    <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                    <button type="submit" class="btn btn-primary" id="{{ item.id }}" onclick="delete_msg(this)"><i class="bi bi-x-square me-1"></i>Close</button>
+                    <br/>                  
+                </div> 
+            </div>
+            {% endif %}
+ 
           <br>
     {% endfor %}
     {% endif %}
@@ -463,6 +505,59 @@
               <br>
 
               {% endif %}
+             
+      
+              {% if item.type == 2 %}
+                  <div class="fm-content">
+                    <div class="mb-3 title-time-display">
+                        <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                        <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title yellow-text">Awaiting Buyer Confirmation Alert</h5>
+                          <br>
+                          <p class="card-text text-white">
+                            We have sent the account detail credentials to the potential buyer. Please wait while they review the account to detemine
+                            whether to proceed with purchase of the account. 
+                          </p>                
+                        </div>
+                    </div>
+                    
+                    <br/>
+
+                    <h5 class="card-title yellow-text mb-2">Account Details:</h5>
+                  
+                    <table class="table table-dark table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Account Name</th>
+                          <th scope="col">Account Type</th>
+                          <th scope="col">Account Brand</th>
+                          <th scope="col">Account Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{{item.account.account_name}}</td>
+                          <td>{{item.account.account_type.value | replace("_", "  ") | title}}</td>
+                          <td>{{item.account.brand}}</td>
+                          <td>{{item.account.price}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <hr class="text-white">
+
+                    <br>
+                    
+                    <div class="mb-3 text-white">                 
+                        <p>{{ moment(item.time_posted).format('LLL') }}.</p>   
+                        <input class="btn btn-primary close_accept" type="button" value="Close" id="{{ item.id }}" onclick="delete_msg(this)">       
+                        <br/>                  
+                    </div> 
+                </div>
+                <br>
+              {% endif %}
 
               {% if item.type == 3 %}
                  <div class="fm-content">
@@ -552,6 +647,137 @@
                 </form>
               </div>
               {% endif %}
+
+              {% if item.type == 5 %}
+              <div class="fm-content accepted" id="accepted">
+                <fieldset >
+                    <div class="mb-3 title-time-display">
+                        <label for="disabledTextInput" class="form-label label-text rounded bg-warning p-2">From: Admin</label>
+                        <span class="text-white time-wait"><i class="bi bi-clock-history p-1"></i>{{ moment(item.time_posted).fromNow(refresh=True) }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title yellow-text">Completed Purchase Alert</h5>
+                        <br>
+                        <p class="card-text text-white">
+                          We have received confirmation from the buyer to finalize purchase of one of your accounts, <span class="yellow-text">{{ item.account.account_name }}</span>, listed below and have finalized it.
+                          You will receive {{ item.account.price }} minus charges as per our terms of service <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">here.</a>
+                          You can choose method of payment below.
+                          <br>                 
+                        </p>
+                        <br>
+
+                        <h5 class="card-title yellow-text mb-2">Purchased Account Details:</h5>
+                          <table class="table table-dark table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col">Account Name</th>
+                                <th scope="col">Account Type</th>
+                                <th scope="col">Account Brand</th>
+                                <th scope="col">Account Price</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{item.account.account_name}}</td>
+                                <td>{{item.account.account_type.value | replace("_", "  ") | title}}</td>
+                                <td>{{item.account.brand}}</td>
+                                <td>{{item.account.price}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+
+                          <div class="mb-4">
+                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                              <span class="text-white">Summary</span>
+                            </h4>
+                            <ul class="list-group mb-3">
+                              <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                  <h6 class="my-0">Account type</h6>
+                                  <small class="text-muted">Type of Account</small>
+                                </div>
+                                <span class="text-success">{{item.account.account_type.value | replace("_", "  ") | title }}</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between bg-light">
+                                <div>
+                                  <h6 class="my-0">Account name</h6>
+                                  <small class="text-muted">Name of the account</small>
+                                </div>
+                                <span class="text-success">{{ item.account.account_name }}</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                  <h6 class="my-0">Account Price</h6>
+                                  <small class="text-muted">Cost of the account listed</small>
+                                </div>
+                                <span class="text-success">ksh {{ item.account.price }}/=</span>
+                              </li>
+
+                              <!-- commision -->
+                              {% set commission = item.account.price * 0.02 %}
+                              <li class="list-group-item d-flex justify-content-between bg-light">
+                                <div class="text-success">
+                                  <h6 class="my-0">Commission Fee</h6>
+                                  <small class="text-muted">Constitutes 2% of initial fee</small>
+                                </div>
+                                <span class="text-success">Ksh {{ "%.2f"|format(commission) }}/=</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between bg-light">
+                                <div class="text-success">
+                                  <h6 class="my-0">Administration Charge</h6>
+                                  <small class="text-muted">Handling fee</small>
+                                </div>
+                                <span class="text-success">Ksh 200/=</span>
+                              </li>
+                              {% set total = item.account.price - 200 %}
+                              <li class="list-group-item d-flex justify-content-between">
+                                <span>Total (KSH)</span>
+                                <strong class="text-success">{{ "%.2f"|format(total) }}/=</strong>
+                              </li>
+                            </ul>
+                          </div>
+                    </div>
+                </fieldset>
+                <br/>
+                <div class="mb-3 text-white">
+                    <p>{{ moment(item.time_posted).format('LLL') }}.</p>
+                    <button type="submit" class="btn btn-primary" id="{{ item.id }}" onclick="delete_msg(this)"><i class="bi bi-x-square me-1"></i>Close</button>
+                    <br/>                  
+                </div> 
+            </div>
+
+            <!--TOS Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content">
+                  <div class="modal-header bg-dark">
+                      <h5 class="modal-title text-white" id="exampleModalLabel">Terms Of Service</h5>
+                      <button type="button" class="text-white btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body px-2">
+                      <ul>
+                          <li>One must register to do any transactions within the market place </li>
+                          <li> The buyers must do money transaction through the official marketplace accounts using their registered details. If not so, it must be communicated clearly. The buyer must indicate the account ID while doing the verification</li>
+                          <li>Transaction will only be complete when the buyer is satisfied with the account. This is when the seller will receive payment and must send other credentials for the account.</li>
+                          <li>The seller only send the logins of the account to the buyer for verification.</li>
+                          <li>Incase of unmet qualities, the buyer is linked directly to the seller for more account clarification, after which the transaction will be complete or a refund will be initiated.</li>
+                          <li>Buyer is given 12hours to reject the account. After receiving all account details and payment is done to the seller, no complains will be accepted.</li>
+                          <li>The marketplace is only responsible for the transactions done through the marketplace. Any transaction done outside is at your own risk.</li>
+                          <li>The reversal of any fund will constitute a 5% fine + admin fees. </li>
+                          <li>If the buyer rejects an account but goes on and change the account details, this will lead to 50-100% fine on the purchase fees.</li>
+                          <li>If the seller fails to upload the credentials of the account, this will result to 50-100% fine on the purchased fees.</li>
+                      </ul>
+                  </div>
+                  <div class="modal-footer bg-dark">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+              </div>
+              </div>
+            </div>
+            
+            {% endif %}
 
               {% if item.type == 6 %}
               <div class="fm-content accepted" id="accepted">
@@ -797,9 +1023,9 @@
         <h5 class="text-white">Get In Touch</h5>
         <ul class="nav flex-column">
           <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-geo-alt-fill mr-2"></i>Juja</p></li>
-          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-telephone-fill mr-2"></i>+254743635629</p></li>
           <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-envelope-fill mr-2"></i>bushwriters@gmail.com</p></li>
-          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254717010172</p></li>
+          <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-whatsapp mr-2"></i>+254743635629</p></li>
           <li class="nav-item mb-2"><p class="nav-link p-0 footer-color"><i class="bi bi-headset mr-2"></i>Customer Support, Sun - Fri, 7AM-10PM</p></li>
         </ul>
       </div>

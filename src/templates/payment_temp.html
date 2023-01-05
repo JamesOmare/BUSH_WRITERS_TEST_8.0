@@ -69,43 +69,26 @@
           width="60"
       /></span>
       </h4>
+      <span class="text-white p-2">Paybill: 247247</span>
+      <br>
+      <span class="text-white p-2">Account Number: 0743635629</span>
+      <br>
       <form action="" method="POST" id = "form-submit">
         {{ mpesa_form.csrf_token }}
         {{ mpesa_form.hidden_tag() }}
 
-        <!-- Phone Number Field -->
-        <div class="row">
-          <div class="col-md-6 mb-3 ">
-            {{ mpesa_form.phone_number.label(class="form-control-label text-white") }}
-            {% if mpesa_form.phone_number.errors %}
-                {{ mpesa_form.phone_number(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in mpesa_form.phone_number.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ mpesa_form.phone_number(class="form-control form-control-lg phone-input", id = "phone_number") }}
-            {% endif %}
-          </div>
-        </div>
+    
         
         <hr class="mb-4">
         <div class="form-group">
-          {{ mpesa_form.pay(class="btn btn-warning btn-block me-5 mb-3 submit-btn") }}
-          <span id="spin"></span>
+         
+         
+          <a href="{{ url_for('main.on_progress', product_id = account.account_id) }}" class="btn btn-warning btn-block me-5 mb-3 submit-btn">Make Payment</a>
+          
         </div>
-        <div id="toast"></div>
+       
         
-        <!-- <div class="toast bg-dark text-white fade show mb-3" id="my-toast">
-          <div class="toast-header bg-success text-white">
-              <strong class="me-auto"><i class="bi bi-hourglass-split pe-2"></i>Delayed Response ?</strong>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-          </div>
-          <div class="toast-body">
-              If you have not received a success prompt on the current page and the mpesa confirmation message has already been sent to your phone, you can send the mpesa message to the admin below. <a href="{{ url_for('main.on_progress', product_id = account.account_id) }}" class="text-blue">Click here!</a>
-          </div>
-        </div> -->
+       
       </form>
     </div>
   </div>

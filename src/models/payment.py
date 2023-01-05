@@ -25,6 +25,7 @@ class Payment(db.Model):
     currency_paid = db.Column(db.String(80), nullable = False)
     transaction_date = db.Column(db.String(50), nullable = False)
     transaction_time = db.Column(db.String(50), nullable = False)
+    date_modified = db.Column(db.DateTime(timezone = True), nullable=False, server_default=func.now(), onupdate=func.now())
     
 
 

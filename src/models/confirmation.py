@@ -16,6 +16,7 @@ class Confirmation(UserMixin ,db.Model):
     is_rejected = db.Column(db.Boolean, default = False)
     is_accepted = db.Column(db.Boolean, default = False)
     time_posted = db.Column(db.DateTime(timezone = True), default = func.now())
+    date_modified = db.Column(db.DateTime(timezone = True), nullable=False, server_default=func.now(), onupdate=func.now())
    
     def __repr__(self):
         return '<Confirmation %r>' % self.id

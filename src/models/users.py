@@ -18,6 +18,7 @@ class User(UserMixin ,db.Model):
     password = db.Column(db.String(350), nullable = False)
     profile_photo = db.Column(db.String(80), nullable=True, default='default_profile.gif')
     date_created = db.Column(db.DateTime (timezone = True), default = func.now())
+    date_modified = db.Column(db.DateTime(timezone = True), nullable=False, server_default=func.now(), onupdate=func.now())
     active = db.Column(db.Boolean, default=True)
     profile_description = db.Column(db.String(100), default = 'Hello There 👋')
     admin = db.Column(db.Boolean(), default=False) 

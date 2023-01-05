@@ -244,12 +244,14 @@ class Upload_Images(FlaskForm):
     account_id = HiddenField()
     upload = SubmitField('Upload')
 
-class Full_Purchase(FlaskForm):
+class Purchase_Status(FlaskForm):
     seller_id = HiddenField()
     account_id = HiddenField()
     completed = SubmitField("Complete Purchase")
-
-class Partial_Purchase(FlaskForm):
+    additional_info = SubmitField("Request Additional Credentials")
+    
+class Conclude_Transaction(FlaskForm):
     seller_id = HiddenField()
     account_id = HiddenField()
-    additional_info = SubmitField("Request Additional Account Credentials")
+    accept = SubmitField("Complete Purchase Process")
+    reject = SubmitField(" Reject Account ")

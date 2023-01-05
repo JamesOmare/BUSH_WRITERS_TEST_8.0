@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 import PIL.Image
 from flask import (Blueprint, redirect, render_template, request, flash, url_for, jsonify, current_app, abort, Response,
-                   copy_current_request_context)
+                   send_file)
 from ..models.accounts import Account
 from ..models.users import User
 from ..models.notification import Notification
@@ -22,7 +22,7 @@ from ..models.files import File
 from ..auth.form_fields import (Seller_Profile_Form, Account_Images, Update_User_Account, Payment_Method, 
                                 Complaint, Confirmation_Form, Seller_Account_Details, Search, FilteredSearch,
                                 Mpesa_Confirm, Contact_Us, Order_By, Seller_Complete_Account_Details, Accept_Account,
-                                Upload_Images, Full_Purchase, Partial_Purchase)
+                                Upload_Images, Purchase_Status, Conclude_Transaction, )
 from ..utils import db, mail
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import and_, desc, asc
@@ -32,7 +32,9 @@ from decouple import config
 import phonenumbers
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
 from flask_mail import Message 
-from http import HTTPStatus
+from glob import glob
+from io import BytesIO
+from zipfile import ZipFile
 
 # configure logging
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(filename)s:%(funcName)s:%(message)s',
@@ -237,7 +239,6 @@ def product_view(item_id):
         elif upload_form.upload.data and upload_form.validate_on_submit():
             uploaded_images = upload_form.photo.data
             account_id = upload_form.account_id.data
-            
 
             
             if uploaded_images:
@@ -362,7 +363,7 @@ def seller():
         else:
             print(seller_form.form_errors)
 
-    return render_template('test_seller_form.html', form = seller_form)
+    return render_template('seller_form.html', form = seller_form)
 
 @main.route('/update', methods = ['GET', 'POST'])
 def update_profile():
@@ -398,6 +399,26 @@ def update_profile():
                            image_file=image_file, form=update_form)
 
 
+@main.route('/download')
+@login_required
+def download():
+    target = 'static/uploads'
+
+    stream = BytesIO()
+    with ZipFile(stream, 'w') as zf:
+        for file in glob(os.path.join(target, 'Screenshot_from_2022-11-08_15-24-20.png')):
+            zf.write(file, os.path.basename(file))
+        for file in glob(os.path.join(target, 'Faucet-Avalanche.png')):
+            zf.write(file, os.path.basename(file))
+    stream.seek(0)
+
+    return send_file(
+        stream,
+        as_attachment=True,
+        download_name='archive.zip'
+    )
+
+
 @main.route('/chat_page/<id>', methods = ['GET', 'POST'])
 @login_required
 def chat(id):
@@ -408,9 +429,9 @@ def chat(id):
     seller_form = Seller_Account_Details()
     accept_form = Accept_Account()
     seller_form_complete = Seller_Complete_Account_Details()
-    purchase_completion = Full_Purchase()
-    partial_completion = Partial_Purchase()
-    file_names = []
+    conclude_transaction = Conclude_Transaction()
+    purchase_status = Purchase_Status()
+
     if buyer_msg and seller_msg:
         if request.method == 'POST':
             if buyer_form.submit.data and buyer_form.validate_on_submit():
@@ -468,7 +489,7 @@ def chat(id):
                 alert.type = updated_type
                 db.session.commit()
                 
-                flash('Account Purchase Confirmation approved.', 'success')
+                flash('Purchase Request Confirmation approved.', 'success')
                 return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form)
 
 
@@ -523,9 +544,10 @@ def chat(id):
                     logging.info(f'Successfully updated notification to status "3"(Successful purchase alert).')
                     
                     flash('Account Purchase Confirmation approved.', 'success')
-                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form) 
+                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, purchase_status = purchase_status) 
 
-                elif purchase_completion.completed.data and purchase_completion.validate_on_submit():
+                
+                elif purchase_status.completed.data and purchase_status.validate_on_submit():
                     seller_id = accept_form.seller_id.data
                     account_id = accept_form.account_id.data
 
@@ -537,13 +559,15 @@ def chat(id):
                     logging.info(f'Successfully updated notification to status "5" which indicates completion of purchase process by the buyer.')
                     
                     flash('Account Purchase Process Completed. Thank you', 'success')
-                    flash('You are higly advised to change account credentials at this point', 'error')
-                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, purchase_completion = purchase_completion, partial_completion = partial_completion) 
-
-                elif partial_completion.additional_info.data and partial_completion.validate_on_submit():
+                    flash('You are higly advised to change account credentials at this point', 'primary')
+                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, purchase_status = purchase_status) 
+         
+                
+                elif purchase_status.additional_info.data and purchase_status.validate_on_submit():
                     seller_id = accept_form.seller_id.data
                     account_id = accept_form.account_id.data
 
+                    # update buyer notification status
                     alert = Notification.query.filter_by(account_id = account_id).first()
                     updated_type = 6
                     alert.type = updated_type
@@ -552,9 +576,41 @@ def chat(id):
                     logging.info(f'Successfully updated notification to status "6" where the seller is notified to send additional account credentials for the final purchase step.')
                     
                     flash('Successfully sent to the admin. Please wait while we get in contact with the buyer to request additional account credentials.', 'success')
-                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, purchase_completion = purchase_completion, partial_completion = partial_completion) 
+                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, purchase_status = purchase_status) 
+
+ 
+                elif conclude_transaction.accept.data and conclude_transaction.validate_on_submit():
+                    seller_id = accept_form.seller_id.data
+                    account_id = accept_form.account_id.data
+
+                    # update buyer notification status
+                    alert = Notification.query.filter_by(account_id = account_id).first()
+                    updated_type = 5
+                    alert.type = updated_type
+                    db.session.commit()
+
+                    logging.info(f'Successfully updated notification to status "5" which indicates completion of purchase process by the buyer.')
+                    
+                    flash('Account Purchase Process Completed. Thank you', 'success')
+                    flash('You are higly advised to change account credentials at this point', 'primary')
+                    return render_template('chat.html', buyer_msg = buyer_msg, seller_msg = seller_msg, form = buyer_form, seller_form = seller_form, accept_form = accept_form, conclude_transaction = conclude_transaction, purchase_status = purchase_status) 
+
+                elif conclude_transaction.reject.data and conclude_transaction.validate_on_submit():
+                    seller_id = accept_form.seller_id.data
+                    account_id = accept_form.account_id.data
+
+                    # update buyer notification status
+                    alert = Notification.query.filter_by(account_id = account_id).first()
+                    print('Alert is: ', alert ,'\n', 'Seller id is: ', seller_id)
+                    updated_type = 4
+                    alert.type = updated_type
+                    db.session.commit()
+                    logging.info(f'Successfully updated the notification to status "4"(Failed purchase alert) which will notify the seller that their account has been rejected .')
+
+                    flash('Successfully sent rejection notice to the admin, we will notify you shortly', 'success')
+                    return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form, accounts = account_credentials, accept_form = accept_form)
                 
-            return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form, accounts = account_credentials, accept_form = accept_form, purchase_completion = purchase_completion, partial_completion = partial_completion)
+            return render_template('chat.html', buyer_msg = buyer_msg, form = buyer_form, accounts = account_credentials, accept_form = accept_form, conclude_transaction = conclude_transaction, purchase_status = purchase_status)
 
 
         else:
@@ -812,7 +868,7 @@ def mpesa_payment(payment_method, product_id, buyer_id, seller_id):
             if account.status == 2:
                 flash('Mpesa confirmation code has been verified, please check your notitfications.', 'success')
         
-    return render_template('payment.html', mpesa_form = mpesa_form, account = account, buyer_id = buyer_id, seller_id = seller_id)
+    return render_template('payment_temp.html', mpesa_form = mpesa_form, account = account, buyer_id = buyer_id, seller_id = seller_id)
 
 
 

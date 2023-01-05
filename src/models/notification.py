@@ -31,7 +31,10 @@ class Notification(UserMixin ,db.Model):
     login_password = db.Column(db.String(120))
     login_email = db.Column(db.String(120))
     time_posted = db.Column(db.DateTime(timezone = True), default = func.now())
+    date_modified = db.Column(db.DateTime(timezone = True), nullable=False, server_default=func.now(), onupdate=func.now())
     account_id = db.Column(db.Integer, db.ForeignKey('account.account_id', ondelete = 'CASCADE'))
+    credentials_id = db.Column(db.Integer, db.ForeignKey('account_credentials.id', ondelete = 'CASCADE'))
+
     
     def __repr__(self):
         return '<Notification %r>' % self.id

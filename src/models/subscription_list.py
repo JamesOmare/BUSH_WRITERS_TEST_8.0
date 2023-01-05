@@ -10,6 +10,7 @@ class Subscription(UserMixin ,db.Model):
     id = db.Column(db.Integer, primary_key = True)
     client_email = db.Column(db.String(120), nullable = False )
     time_posted = db.Column(db.DateTime(timezone = True), default = func.now())
+    date_modified = db.Column(db.DateTime(timezone = True), nullable=False, server_default=func.now(), onupdate=func.now())
    
     def __repr__(self):
         return '<Subscription %r>' % self.id
